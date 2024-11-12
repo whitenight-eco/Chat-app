@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "881842885282",
+    "firebase_url": "https://abdoa-38e01-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "abdoa-38e01",
+    "storage_bucket": "abdoa-38e01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881842885282:android:bf5b8c8cf4cae0e92c7dfb",
+        "android_client_info": {
+          "package_name": "DX.abdoa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABhHO8_rOl81Z6agSTOBhds3eA4rRgjsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881842885282:android:5bb7ae2b498be8272c7dfb",
+        "android_client_info": {
+          "package_name": "com.watch.cameroonhealth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABhHO8_rOl81Z6agSTOBhds3eA4rRgjsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881842885282:android:d831f366c1be61342c7dfb",
+        "android_client_info": {
+          "package_name": "com.watch.cypher"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABhHO8_rOl81Z6agSTOBhds3eA4rRgjsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881842885282:android:d12f697826b1c3a62c7dfb",
+        "android_client_info": {
+          "package_name": "com.watch.tuchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABhHO8_rOl81Z6agSTOBhds3eA4rRgjsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881842885282-2bci6nh859qmpttnfojhp4m9o1un9lp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

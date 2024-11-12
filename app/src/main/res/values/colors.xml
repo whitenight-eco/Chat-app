@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FEFEFE</color>
+    <color name="reply">#E1F5FE</color>
+    <color name="response">#F1F8E9</color>
+    <color name="bg">#131212</color>
+    <color name="blue">#05FBFB</color>
+
+</resources>
