@@ -46,6 +46,48 @@
 
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/second"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/startBtn"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:layout_margin="25dp"
+            android:fontFamily="@font/poppins_bold"
+            android:text="Enter a username"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_marginBottom="10dp"
+            android:id="@+id/nameLayout"
+            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            app:boxStrokeColor="@color/selector"
+            app:hintTextColor="@color/white"
+            android:textColorHint="@color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nameEt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_regular"
+                android:textCursorDrawable="@null"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:maxLength="20"
+                android:textAllCaps="false"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
 
     <com.google.android.material.button.MaterialButton
@@ -54,7 +96,7 @@
         android:layout_height="wrap_content"
         app:backgroundTint="@color/blue"
         android:text="Start"
-        android:textColor="@color/black"
+        android:textColor="@color/bg"
         android:padding="15dp"
         android:fontFamily="@font/urbanist"
         android:textStyle="bold"

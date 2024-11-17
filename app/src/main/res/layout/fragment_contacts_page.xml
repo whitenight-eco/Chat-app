@@ -240,54 +240,111 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Scan bluetooth devices"
-                    android:paddingTop="3dp"
-                    android:fontFamily="@font/poppins_regular"
-                    android:gravity="start"
-                    android:textSize="12dp"
-                    android:textColor="@color/white" />
-
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/lottieView"
-                    android:layout_marginTop="50dp"
+                <LinearLayout
+                    android:id="@+id/btscanLayout"
+                    android:visibility="visible"
                     android:layout_width="match_parent"
-                    android:layout_margin="20dp"
-                    android:layout_height="wrap_content"
-                    app:lottie_rawRes="@raw/scananim"
-                    app:lottie_autoPlay="false"
-                    app:lottie_loop="true"/>
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/swiperbt"
+                    <TextView
+                        android:id="@+id/helptext"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan bluetooth devices or Host a Connection"
+                        android:paddingTop="3dp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:gravity="start"
+                        android:textSize="12dp"
+                        android:textColor="@color/white" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieView"
+                        android:layout_marginTop="50dp"
+                        android:layout_width="match_parent"
+                        android:layout_margin="20dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        app:lottie_rawRes="@raw/scananim"
+                        app:lottie_autoPlay="false"
+                        app:lottie_loop="true"/>
+
+                    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                        android:id="@+id/swiperbt"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/mainRecyclerviewbt"
+                            android:nestedScrollingEnabled="false"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clipToPadding="false" />
+
+
+                    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+                    <TextView
+                        android:id="@+id/scantext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginVertical="10dp"
+                        android:text="Tap to start Scan"
+                        android:paddingTop="3dp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:gravity="start"
+                        android:textSize="12dp"
+                        android:textColor="@color/blue" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bthostLayout"
                     android:visibility="gone"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/mainRecyclerviewbt"
+                    <TextView
+                        android:id="@+id/helptext2"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Host a Connection or Scan bluetooth devices"
+                        android:paddingTop="3dp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:gravity="start"
+                        android:textSize="12dp"
+                        android:textColor="@color/white" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieView2"
+                        android:layout_marginTop="50dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clipToPadding="false" />
+                        android:layout_margin="20dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        app:lottie_rawRes="@raw/bt"
+                        app:lottie_autoPlay="false"
+                        app:lottie_loop="true"/>
+                    <TextView
+                        android:id="@+id/hosttext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Tap to start Host"
+                        android:paddingTop="3dp"
+                        android:layout_marginVertical="10dp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:gravity="start"
+                        android:textSize="12dp"
+                        android:textColor="@color/blue" />
+                </LinearLayout>
 
-
-                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-                <TextView
-                    android:id="@+id/scantext"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Click to start Scan"
-                    android:paddingTop="3dp"
-                    android:fontFamily="@font/poppins_regular"
-                    android:gravity="start"
-                    android:textSize="12dp"
-                    android:textColor="@color/blue" />
             </LinearLayout>
 
 

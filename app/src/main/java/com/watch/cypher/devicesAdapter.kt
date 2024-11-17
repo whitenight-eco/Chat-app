@@ -2,17 +2,12 @@ package com.watch.cypher
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.watch.cypher.dataModel.deviceData
 
 
 class devicesAdapter (private val context: Context, private val event: MutableList<deviceData>) :

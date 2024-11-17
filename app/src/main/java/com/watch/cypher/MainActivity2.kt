@@ -15,7 +15,6 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -28,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.watch.cypher.dataModel.deviceData
 import com.watch.cypher.databinding.ActivityMain2Binding
 import com.watch.cypher.databinding.ItemMessageBinding
 import com.xwray.groupie.GroupAdapter
@@ -195,7 +195,6 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     @SuppressLint("MissingPermission")
-
 
     private fun enableBluetooth() {
         Log.e(TAG, "CALLED !!!!!!!")

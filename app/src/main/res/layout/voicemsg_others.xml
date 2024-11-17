@@ -22,18 +22,40 @@
             android:padding="5dp"
             android:layout_marginHorizontal="10dp"
             android:layout_width="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:gravity="center"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/playbtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/play"/>
+            <com.masoudss.lib.WaveformSeekBar
+                android:layout_marginHorizontal="5dp"
+                android:id="@+id/waveformSeekBar"
+                android:layout_gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                app:wave_progress="100"
+                app:wave_max_progress="100"
+                app:wave_width="3dp"
+                app:wave_gap="2dp"
+                app:wave_min_height="5dp"
+                app:wave_corner_radius="2dp"
+                app:wave_background_color="@color/white"
+                app:wave_progress_color="@color/blue"
+                app:wave_gravity="center"/>
             <TextView
-                android:id="@+id/content"
+                android:id="@+id/timer"
+                android:layout_gravity="center"
                 android:gravity="center"
                 android:paddingTop="3dp"
+                android:fontFamily="@font/poppins_regular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello"
-                android:fontFamily="@font/poppins_regular"
+                android:text="00:20"
                 android:textColor="@color/white"
                 android:textSize="14sp"/>
         </LinearLayout>

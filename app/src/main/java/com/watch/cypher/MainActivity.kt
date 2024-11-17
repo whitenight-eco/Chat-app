@@ -34,6 +34,7 @@ import com.watch.cypher.dataManager.AppDatabase
 import com.watch.cypher.dataModel.UserData
 import com.watch.cypher.databinding.ActivityMainBinding
 import com.watch.cypher.fragments.ContactsPage
+import com.watch.cypher.fragments.StartPage
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
@@ -43,12 +44,16 @@ import java.util.UUID
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val contactsPage: ContactsPage by lazy { ContactsPage() }
+    private val startPage: StartPage by lazy { StartPage() }
+
     companion object {
         lateinit var mainUser: UserData
     }
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(this@MainActivity)
@@ -57,19 +62,15 @@ class MainActivity : AppCompatActivity() {
             if (existingUser != null){
                 mainUser = existingUser
                 Log.d("sqdfqijfozsef", mainUser.id)
+                showFragment(contactsPage, "contacts")
+            }else{
+                showFragment(startPage, "start")
             }
         }
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        showFragment(contactsPage, "contacts")
-
     }
 
     private fun showFragment(fragment: Fragment, tag: String) {
-        val transaction = supportFragmentManager.beginTransaction().apply {
-        }
+        val transaction = supportFragmentManager.beginTransaction()
         supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
         // Detach all fragments

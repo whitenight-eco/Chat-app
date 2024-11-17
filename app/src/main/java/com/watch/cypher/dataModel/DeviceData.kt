@@ -1,4 +1,4 @@
-package com.watch.cypher
+package com.watch.cypher.dataModel
 
 import android.bluetooth.BluetoothDevice
 

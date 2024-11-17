@@ -27,12 +27,26 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_height="70dp"
                 android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:cardCornerRadius="50dp"
+                    android:layout_margin="20dp"
+                    android:layout_gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/pfp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </androidx.cardview.widget.CardView>
                 <TextView
                     android:id="@+id/psname"
                     android:layout_margin="5dp"
+                    android:layout_gravity="center_vertical"
                     android:gravity="center"
                     android:paddingTop="4dp"
                     android:layout_width="wrap_content"
@@ -48,17 +62,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp" />
+
+
+
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/boxContainer"
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="20dp"
             app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/imgbtn"
+                android:layout_width="60dp"
+                android:padding="10dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/addimg" />
 
 
             <androidx.cardview.widget.CardView
@@ -95,6 +121,14 @@
             </androidx.cardview.widget.CardView>
 
 
+            <ImageView
+                android:id="@+id/recordbtn"
+                android:visibility="gone"
+                android:layout_width="60dp"
+                android:layout_height="35dp"
+                android:src="@drawable/wave"/>
+
+
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/sendButton"
                 android:layout_width="60dp"
@@ -106,7 +140,106 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/helpContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:background="@color/bg"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/startBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:cornerRadius="20dp"
+                android:backgroundTint="@color/blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="Start Connection"
+                android:textColor="@color/bg"
+                android:fontFamily="@font/urbanist"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/helpertext"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="50dp" />
+
+            <TextView
+                android:id="@+id/helpertext"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_regular"
+                android:text="One user should host, while the other connects to join."/>
+        </LinearLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="0dp"
+        android:visibility="visible"
+        android:id="@+id/addeventsheet"
+        app:cardBackgroundColor="@color/bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:padding="20dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/hostBtn"
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="Host Connection"
+                android:textColor="@color/bg"
+                android:fontFamily="@font/urbanist"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toTopOf="@id/connectBtn" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/connectBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="Connect to Device"
+                android:textColor="@color/bg"
+                android:fontFamily="@font/urbanist"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

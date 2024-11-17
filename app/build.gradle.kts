@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.devtools.ksp")
+    id("kotlin-parcelize")
 
 }
 
@@ -70,6 +71,7 @@ dependencies {
 
     //Animation
     implementation (libs.lottie)
+    implementation ("com.github.razir.progressbutton:progressbutton:2.1.0")
 
     //data
     implementation (libs.gson)
@@ -78,6 +80,19 @@ dependencies {
     implementation ("com.google.zxing:core:3.4.1")   // For QR Code generation
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
 
+
+    //Glide
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation ("com.github.bumptech.glide:okhttp3-integration:4.15.1")
+
+
+    implementation ("com.kroegerama:bottomsheet-imagepicker:1.1.2")
+
+    implementation ("com.github.AsynctaskCoffee:VoiceRecorder:beta-0.5")
+
+
+    implementation ("com.github.massoudss:waveformSeekBar:5.0.2")
+    implementation ("com.github.lincollincol:amplituda:2.2.2")
 
 
 }
