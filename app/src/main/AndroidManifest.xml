@@ -18,9 +18,6 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
-
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -49,12 +46,6 @@
 
         <activity
             android:name=".PortraitCaptureActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity2"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity3"
             android:exported="false" />
 
         <activity

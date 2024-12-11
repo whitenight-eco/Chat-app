@@ -132,14 +132,18 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
             arguments?.getParcelable("contactData")
         }
         convoID = contactData?.conversationId!!
-        Log.i("Bluqzdqzdqetooth", "aa ${contactData?.BTID!!}")
 
-        BTaddress = extractAddressFromUniqueId(contactData?.BTID!!)
-        Log.i("Bluqzdqzdqetooth", "ss $BTaddress")
+        if (contactData?.BTID != null)
+            BTaddress = extractAddressFromUniqueId(contactData?.BTID!!)
         // Register the media picker result launcher during fragment attachment
         if (convoType == 0){
+            Log.d("MessagesqdZDZDZDZzqdq", "aaass ${contactData?.pfpurl}")
+            Glide.with(requireContext()).load(contactData?.pfpurl).into(binding.pfp)
+            binding.psname.text = contactData?.username
+            binding.boxContainer.visibility = View.VISIBLE
+            binding.helpContainer.visibility = View.GONE
+            loadImage(contactData?.pfpurl,contactData?.pfp)
             connectWebSocket(MainActivity.mainUser.id)
-
 
             binding.mainRecyclerview.apply {
                 layoutManager = LinearLayoutManager(this.context).apply {
@@ -179,22 +183,63 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
                             // Optional: Handle animation repeat
                         }
                     })
-                    val messageJson = JSONObject().apply {
-                        put("action", "message")
-                        put("msg", binding.commentEditText.text.toString())
-                        put("from", userID!!)
-                        put("conversationID", convoID)
-                    }
-                    webSocketClient.send(messageJson.toString())
+                    // Prepare the message
+                    val message = MessageData(
+                        conversationId = convoID!!,
+                        senderID = userID!!,
+                        content = binding.commentEditText.text.toString(),
+                        type = MessageType.TEXT, // You can set this based on the message type
+                        timestamp = System.currentTimeMillis()
+                    )
+
+                    val payload = mapOf(
+                        "action" to "message",  // Add the action type
+                        "conversationID" to message.conversationId,
+                        "from" to message.senderID,
+                        "msg" to message.content,
+                        "timestamp" to message.timestamp
+                    )
+
+                    val json = gson.toJson(payload)
+                    webSocketClient.send(json)
+
+
                     createMessage(convoID!!,userID!!,binding.commentEditText.text.toString(),img,MessageType.TEXT,null)
                 }
                 else{
                     binding.sendButton.isEnabled = true
                 }
             }
+            pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                // Handle the selected URI
+                if (uri != null) {
+                    img = compressImage(uri,requireContext())
+                    val message = MessageData(
+                        conversationId = convoID!!,
+                        senderID = userID!!,
+                        content = "img",
+                        imageUrl = img,
+                        type = MessageType.IMAGE,
+                        timestamp = System.currentTimeMillis()
+                    )
+                    val payload = mapOf(
+                        "action" to "message",  // Add the action type
+                        "conversationID" to message.conversationId,
+                        "from" to message.senderID,
+                        "msg" to message.content,
+                        "timestamp" to message.timestamp,
+                        "image_data" to message.imageUrl
 
-            binding.psname.text = convoID
+                    )
+                    Log.d("MessagesqdZDZDZDZzqdq", "$img")
+
+                    val json = gson.toJson(payload)
+                    webSocketClient.send(json)
+                    createMessage(convoID!!,userID!!,binding.commentEditText.text.toString(),img,MessageType.IMAGE,null)
+                }
+            }
         }
+
         else{
             fetchMessages(convoID!!)
             binding.psname.text = contactData?.username!!
@@ -218,10 +263,6 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
 
             binding.startBtn.setOnClickListener {
                 eventSheet.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-
-            binding.imgbtn.setOnClickListener {
-                checkAndLaunchPhotoPicker()
             }
 
             binding.connectBtn.setOnClickListener {
@@ -299,9 +340,12 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
             openDialog()
         }
 
+        binding.imgbtn.setOnClickListener {
+            checkAndLaunchPhotoPicker()
+        }
+
 
     }
-
 
     fun openDialog() {
         VoiceSenderDialog(this).show(childFragmentManager, "VOICE")
@@ -315,16 +359,32 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
                 val message = MessageData(
                     conversationId = convoID!!,
                     senderID = userID!!,
-                    content = "img",
+                    content = "audio",
                     voiceChat = byteArrays,
                     type = MessageType.VOICE,
                     timestamp = System.currentTimeMillis()
                 )
-                createMessage(convoID!!,userID!!,binding.commentEditText.text.toString(),img,MessageType.VOICE,byteArrays)
-                val json = gson.toJson(message)
-                val byteArray = json.toByteArray(Charsets.UTF_8)
-                ConnectedThread(sockets).write(byteArray)
+                if (convoType == 0){
+                    val payload = mapOf(
+                        "action" to "message",  // Add the action type
+                        "conversationID" to message.conversationId,
+                        "from" to message.senderID,
+                        "msg" to message.content,
+                        "timestamp" to message.timestamp,
+                        "voice_data" to message.voiceChat
 
+                    )
+                    Log.d("MessagesqdZDZDZDZzqdq", "$img")
+
+                    val json = gson.toJson(payload)
+                    webSocketClient.send(json)
+                    createMessage(convoID!!,userID!!,binding.commentEditText.text.toString(),img,MessageType.VOICE,byteArrays)
+                }else{
+                    createMessage(convoID!!,userID!!,binding.commentEditText.text.toString(),img,MessageType.VOICE,byteArrays)
+                    val json = gson.toJson(message)
+                    val byteArray = json.toByteArray(Charsets.UTF_8)
+                    ConnectedThread(sockets).write(byteArray)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling audio file: $audioUri", e)
                 Toast.makeText(context, "Failed to play audio", Toast.LENGTH_SHORT).show()
@@ -384,7 +444,12 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
         val pickIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         pickIntent.type = "image/*" // You can customize this to handle videos or both image/video
         pickIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-        startActivityForResult(pickIntent, PERMISSION_REQUEST_CODE)
+
+        try {
+            startActivityForResult(pickIntent, PERMISSION_REQUEST_CODE)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Error launching photo picker: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     // Handle the result for legacy devices that don't support the Photo Picker
@@ -394,13 +459,30 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
         if (requestCode == PERMISSION_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val uri = data?.data
             if (uri != null) {
-                Log.d("LegacyPhotoPicker", "Selected URI: $uri")
+                try {
+                    val img = compressImage(uri, requireContext())
+                    val message = MessageData(
+                        conversationId = convoID!!,
+                        senderID = userID!!,
+                        content = "img",
+                        imageUrl = img,
+                        type = MessageType.IMAGE,
+                        timestamp = System.currentTimeMillis()
+                    )
+                    createMessage(convoID!!, userID!!, binding.commentEditText.text.toString(), img, MessageType.IMAGE, null)
+                    val json = gson.toJson(message)
+                    val byteArray = json.toByteArray(Charsets.UTF_8)
+                    ConnectedThread(sockets).write(byteArray)
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Error processing image: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             } else {
-                Log.d("LegacyPhotoPicker", "No media selected")
+                Toast.makeText(requireContext(), "No media selected", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            Toast.makeText(requireContext(), "Failed to select image", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
 
@@ -437,7 +519,7 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
     private fun connectWebSocket(usrd:String) {
         Log.d("MessagesqdZDZDZDZzqdq", "CALLED")
 
-        val uri = URI("ws://192.168.1.65:3000")
+        val uri = URI("ws://cipherflare.tech")
         //val uri = URI("ws://10.0.2.2:3000")
 
         webSocketClient = object : WebSocketClient(uri) {
@@ -448,16 +530,51 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
 
             override fun onMessage(message: String?) {
                 activity?.runOnUiThread {
-                    message?.let {
-                        val received = JSONObject(it)
-                        val msg = received.optString("msg")
-                        val from = received.optString("from")
-                        if (from != userID)
-                            createMessage(convoID!!,from,msg,img,MessageType.TEXT,null)
+                    message?.let { jsonString ->
+                        try {
+                            // Parse the JSON string into a MessageData object
+                            val receivedData = gson.fromJson(jsonString, MessageData::class.java)
+                            Log.d("MessagesqdZDZDZDZzqdq", "${receivedData.type}")
+
+                            // Ensure convoID is available
+                            if (convoID != null && receivedData.senderID != userID) {
+                                // Log before calling createMessage to check the conditions
+                                Log.d("MessagesqdZDZDZDZzqdq", "Passed the condition check: convoID: $convoID, senderID: ${receivedData.senderID}, userID: $userID")
+
+                                // Log the content of receivedData
+                                Log.d("MessagesqdZDZDZDZzqdq", "Content: ${receivedData.content}, imageUrl: ${receivedData.imageUrl}, voiceChat: ${receivedData.voiceChat}")
+
+                                // If imageUrl is not null, log the size or content to ensure it's not empty or malformed
+                                if (receivedData.imageUrl != null) {
+                                    Log.d("MessagesqdZDZDZDZzqdq", "Image URL size: ${receivedData.imageUrl!!.size}")
+                                } else {
+                                    Log.d("MessagesqdZDZDZDZzqdq", "Image URL is null")
+                                }
+
+                                // Now, call createMessage
+                                try {
+                                    Log.d("MessagesqdZDZDZDZzqdq", "Calling createMessage with convoID: $convoID, senderID: ${receivedData.senderID}")
+                                    createMessage(
+                                        convoID!!,
+                                        receivedData.senderID,
+                                        receivedData.content!!,
+                                        receivedData.imageUrl,
+                                        receivedData.type,
+                                        receivedData.voiceChat
+                                    )
+                                } catch (e: Exception) {
+                                    Log.e("MessagesqdZDZDZDZzqdq", "Error calling createMessage: ${e.message}", e)
+                                }
+                            }
+
+                        } catch (e: Exception) {
+                            Log.e("WebSocketClient", "Error parsing message: ${e.message}")
+                        }
                     }
                 }
                 Log.d("WebSocketClient", "Message received: $message")
             }
+
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
                 Log.d("WebSocketClient", "Disconnected: $reason")
@@ -515,8 +632,13 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
         }
     }
 
-    private fun createMessage(id:String,senderID:String,message:String,imgSet:ByteArray?,TYPE:MessageType,audio:ByteArray?){
-        val message = MessageData(
+    private fun createMessage(id: String, senderID: String, message: String, imgSet: ByteArray?, TYPE: MessageType, audio: ByteArray?) {
+        // Log message creation details
+        Log.d("dzqzqdqzqqdzqqdqqqdq", "called")
+        Log.d("dzqzqdqzqqdzqqdqqqdq", "Creating message: ID: $id, Sender: $senderID, Message: $message, Type: $TYPE, Image set: ${imgSet?.size}, Audio set: ${audio?.size}")
+
+        // Create the MessageData object
+        val messageData = MessageData(
             conversationId = convoID!!,
             senderID = senderID,
             content = message,
@@ -526,14 +648,37 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
             timestamp = System.currentTimeMillis()
         )
 
+        // Log the MessageData object
+        Log.d("dzqzqdqzqqdzqqdqqqdq", "Message created: $messageData")
+
+        // Get the database and DAO
         val db = AppDatabase.getDatabase(requireContext())
         val appDao = db.appDao()
+
+        // Insert the message into the database in a coroutine
         lifecycleScope.launch {
-            appDao.insertMessage(message)
-            updateMessagesList(id)
+            try {
+                // Log before inserting message
+                Log.d("dzqzqdqzqqdzqqdqqqdq", "Inserting message into database...")
+                appDao.insertMessage(messageData)
+
+                // Log after inserting message
+                Log.d("dzqzqdqzqqdzqqdqqqdq", "Message inserted successfully.")
+
+                // Update messages list
+                updateMessagesList(id)
+            } catch (e: Exception) {
+                // Log any errors during the database operation
+                Log.e("dzqzqdqzqqdzqqdqqqdq", "Error inserting message into database: ${e.message}", e)
+            }
         }
+
+        // Clear the input field and re-enable the send button
         binding.commentEditText.text.clear()
         binding.sendButton.isEnabled = true
+
+        // Log that the send button is re-enabled
+        Log.d("dzqzqdqzqqdzqqdqqqdq", "Send button re-enabled and input cleared.")
     }
 
 
@@ -877,7 +1022,7 @@ class ConversationPage : Fragment(R.layout.fragment_conversation_page), AudioRec
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     checkAndLaunchPhotoPicker()
                 } else {
-                    Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Permission Denied. You need to allow storage permission to pick a photo.", Toast.LENGTH_LONG).show()
                 }
             }
             2 -> {

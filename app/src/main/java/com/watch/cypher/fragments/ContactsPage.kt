@@ -10,6 +10,8 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -33,6 +35,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -40,10 +43,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
@@ -59,6 +64,7 @@ import com.watch.cypher.adapters.BtDevicesAdapter
 import com.watch.cypher.adapters.ContactsAdapter
 import com.watch.cypher.dataManager.AppDao
 import com.watch.cypher.dataManager.AppDatabase
+import com.watch.cypher.dataModel.ChatType
 import com.watch.cypher.dataModel.UserData
 import com.watch.cypher.dataModel.ContactData
 import com.watch.cypher.dataModel.ConversationData
@@ -81,6 +87,7 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
     private val discoveredDevices = mutableListOf<btData>() // Store discovered devices
     private lateinit var binding: FragmentContactsPageBinding
     private var allPosts = mutableListOf<ContactData>()
+    private var allPosts2 = mutableListOf<ContactData>()
     private val TAG: String = "999ZDZDZ9W"
     private lateinit var mHandler: Handler
     var screenHeight = 0
@@ -125,22 +132,30 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
 
 
         lifecycleScope.launch {
-            // Step 1: Add a new user
-            addNewUser(appDao, UUID.randomUUID().toString().replace("-", "").take(12))
-
-            // Step 2: Fetch the contacts in the coroutine
             val contacts = getContactsList(appDao)
 
+            binding.swiper.setOnRefreshListener {
+                lifecycleScope.launch {
+                    allPosts.clear()
+                    allPosts.addAll(getContactsList(appDao))
+                    binding.mainRecyclerview.adapter?.notifyDataSetChanged()
+                    binding.swiper.isRefreshing = false
+                }
+            }
+
             allPosts.addAll(contacts)
+            allPosts2.addAll(allPosts)
+
             // Step 3: Set up the RecyclerView with the fetched contacts
             binding.mainRecyclerview.apply {
                 layoutManager = LinearLayoutManager(this.context)
-                adapter = ContactsAdapter(requireContext(), allPosts).apply {
+                adapter = ContactsAdapter(requireContext(), allPosts2).apply {
                     setOnItemClickListener(object : ContactsAdapter.onItemClickListener {
                         override fun onItemClick(position: Int) {
-                            if (allPosts[position].conversationType.toString() == "ONLINE"){
+                            if (allPosts2[position].conversationType.toString() == "ONLINE"){
                                 val bundle = Bundle()
-                                bundle.putString("convoID", allPosts[position].conversationId)
+                                bundle.putInt("convoType", 0)
+                                bundle.putParcelable("contactData", allPosts2[position])
                                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
                                 val frg = ConversationPage()
                                 frg.arguments = bundle
@@ -159,7 +174,6 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
                             }
                             else{
                                 val bundle = Bundle()
-                                bundle.putInt("convoType", 1)
                                 bundle.putParcelable("contactData", allPosts[position])
                                 Log.d("checkfs", "un: ${allPosts[position].conversationId}")
                                 Log.d("checkfs", "uno: ${allPosts[position].BTID!!}")
@@ -202,6 +216,20 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
         closeIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
 
         binding.addcontact.setOnClickListener {
+            binding.addeventsheet.setOnClickListener {  }
+            binding.radioGroupe.setOnCheckedChangeListener { group, checkedId ->
+                when (checkedId) {
+                    binding.enabledSelected.id -> {
+                        binding.onlineLayout.visibility = View.GONE
+                        binding.btscLayout.visibility = View.VISIBLE
+                    }
+                    binding.disabledSelected.id -> {
+                        binding.onlineLayout.visibility = View.VISIBLE
+                        binding.btscLayout.visibility = View.GONE
+                    }
+                }
+            }
+
             val p1 = "Scan bluetooth devices or Host a Connection"
             val spannableString1 = SpannableString(p1)
 
@@ -267,23 +295,6 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
 
                             checkAndPairDevice(discoveredDevices[position].device)
 
-                            /*val addressId = discoveredDevices[position].addres
-                            val genId = UUID.randomUUID().toString().replace("-", "").take(14)
-
-                            val conversation = ConversationData(addressId, ConvoType.BLUETOOTH)
-                            lifecycleScope.launch {
-                                //appDao.insertConversation(conversation)
-                                addContact(appDao,genId, addressId, ConvoType.BLUETOOTH)
-                            }
-                            val animator = ValueAnimator.ofInt(screenHeight, 0)
-                            animator.addUpdateListener { valueAnimator ->
-                                // Update the peek height of the first bottom sheet during the animation.
-                                val height = valueAnimator.animatedValue as Int
-                                eventSheet.peekHeight = height
-                            }
-                            animator.duration = 300  // Set the duration of the animation.
-                            animator.start()  // Start the animation.
-                            */
                         }
                     })
                 }
@@ -307,17 +318,13 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
                 startBluetoothScan()
 
             }
-
             binding.lottieView2.setOnClickListener {
                 binding.lottieView2.isEnabled = false
                 binding.lottieView2.playAnimation()
                 startBluetoothAcceptThread()
                 binding.hosttext.visibility = View.INVISIBLE
             }
-
-
             binding.backbtn.setOnClickListener {
-
                 val animator = ValueAnimator.ofInt(screenHeight, 0)
                 animator.addUpdateListener { valueAnimator ->
                     // Update the peek height of the first bottom sheet during the animation.
@@ -328,9 +335,55 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
                 animator.start()  // Start the animation.
             }
 
-            //checkAndCreateDocument("Convs",generateConsistentHashedId(mainUser.id,"35f4c40b2c1e"),mainUser.id,"35f4c40b2c1e")
+            binding.idHolder.text = mainUser.id
+
+            //online
+            binding.addctBtn.setOnClickListener {
+                checkAndCreateDocument(binding.idEt.text.toString())
+            }
+
+            binding.copybtn.setOnClickListener {
+                val textToCopy = binding.idHolder.text.toString() // Replace with your actual text
+                val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", textToCopy)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(requireContext(), "Text copied to clipboard!", Toast.LENGTH_SHORT).show()
+            }
         }
 
+
+        binding.srchv.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Optionally, perform action when the search is submitted (not needed for real-time filtering)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // When the text changes, filter the allPosts list
+                filterContacts(newText)
+                return true
+            }
+        })
+
+    }
+
+    fun filterContacts(query: String?) {
+        if (query.isNullOrEmpty()) {
+            // If the query is empty, reset the filtered list to show all posts
+            allPosts2.clear()
+            allPosts2.addAll(allPosts)
+        } else {
+            // Filter the contacts where the username starts with the query text (case insensitive)
+            allPosts2.clear() // Clear previous results
+            allPosts2.addAll(
+                allPosts.filter { contact ->
+                    contact.username.startsWith(query, ignoreCase = true)
+                }
+            )
+        }
+
+        binding.mainRecyclerview.adapter?.notifyDataSetChanged()
 
     }
 
@@ -354,37 +407,99 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
         return contactsList
     }
 
-    private suspend fun addNewUser(appDao: AppDao, userId: String) {
-        // Check if user already exists
-        val existingUser = appDao.getUserInfo()
-
-        if (existingUser == null) {
-            // User does not exist, insert new user
-            appDao.insertUser(UserData(id = userId,"usermamas"))
-            Log.d("checkfs", "New user added with ID: $userId")
-        } else {
-            Log.d("checkfs", "User already exists with ID: ${existingUser.id}")
-        }
-    }
-
-    private suspend fun addContact(
-        appDao: AppDao,
-        contactId: String,
-        convoID: String,
-        convoType: ConvoType
-    ) {
+    private suspend fun addContactOnline(appDao: AppDao, contactId: String) {
         // Check if contact already exists
-        val existingContact = if(convoType == ConvoType.ONLINE){appDao.getContactById(contactId)}else{appDao.getContactByConvoID(convoID)}
-        Log.d("checkfs", "Contact already exists with ID sssssssssss: ${existingContact}")
-        Log.d("checkfs", "Contact already exists with ID sssssssssssaaaaa: ${convoID}")
+        Log.d("addContactOnline", "Checking if contact exists with ID: $contactId")
+        val existingContact = appDao.getContactById(contactId)
 
         if (existingContact == null) {
-            // Contact does not exist, insert new contact
-            //appDao.insertContact(ContactData(id = contactId, conversationId = convoID, conversationType = convoType))
-            updateContactsList()
-            Log.d("checkfs", "New contact added with ID: $convoID")
+            Log.d("addContactOnline", "Contact does not exist. Proceeding to fetch from Firestore.")
+
+            val db = FirebaseFirestore.getInstance()
+            val docRef = db.collection("Users").document(binding.idEt.text.toString())
+
+            Log.d("addContactOnline", "Fetching user with ID: ${binding.idEt.text}")
+
+            docRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    Log.d("addContactOnline", "User document found in Firestore.")
+                    val rawData = documentSnapshot.data
+                    Log.d("addContactOnline", "Raw document data: $rawData")
+                    val userData = documentSnapshot.toObject<UserData>()
+                    if (userData != null) {
+                        Log.d("addContactOnline", "User data fetched: $userData")
+                        val ldb = AppDatabase.getDatabase(requireContext())
+                        val appDao = ldb.appDao()
+
+                        lifecycleScope.launch {
+                            Log.d("addContactOnline", "Inserting contact into local database.")
+                            appDao.insertContact(
+                                ContactData(
+                                    userData.id,
+                                    userData.username,
+                                    userData.BTID,
+                                    userData.pfpurl,
+                                    null,
+                                    generateConsistentHashedId(mainUser.id, binding.idEt.text.toString()),
+                                    ConvoType.ONLINE
+                                )
+                            )
+                            Log.d("addContactOnline", "Contact inserted successfully.")
+                            updateContactsList()
+                        }
+                    } else {
+                        Log.d("addContactOnline", "User data is null. Inserting 'Unknown' contact.")
+                        lifecycleScope.launch {
+                            appDao.insertContact(
+                                ContactData(
+                                    contactId,
+                                    "Unknown",
+                                    null,
+                                    null,
+                                    null,
+                                    generateConsistentHashedId(mainUser.id, contactId),
+                                    ConvoType.ONLINE
+                                )
+                            )
+                            updateContactsList()
+                        }
+                    }
+                } else {
+                    Log.d("addContactOnline", "No document found for user ID: ${binding.idEt.text}")
+                    lifecycleScope.launch {
+                        appDao.insertContact(
+                            ContactData(
+                                contactId,
+                                "Unknown",
+                                null,
+                                null,
+                                null,
+                                generateConsistentHashedId(mainUser.id, contactId),
+                                ConvoType.ONLINE
+                            )
+                        )
+                        updateContactsList()
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.e("addContactOnline", "Error fetching user from Firestore: ${e.message}", e)
+                lifecycleScope.launch {
+                    appDao.insertContact(
+                        ContactData(
+                            contactId,
+                            "Unknown",
+                            null,
+                            null,
+                            null,
+                            generateConsistentHashedId(mainUser.id, contactId),
+                            ConvoType.ONLINE
+                        )
+                    )
+                    updateContactsList()
+                }
+            }
         } else {
-            Log.d("checkfs", "Contact already exists with ID: ${existingContact.id}")
+            Log.d("addContactOnline", "Contact already exists with ID: ${existingContact.id}")
         }
     }
 
@@ -399,52 +514,102 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
         }
     }
 
-    fun checkAndCreateDocument(collectionPath: String, documentId: String, userID: String, contactID:String) {
+    fun checkAndCreateDocument(contactID: String) {
         val ldb = AppDatabase.getDatabase(requireContext())
         val appDao = ldb.appDao()
         val db = FirebaseFirestore.getInstance()
-        val docRef = db.collection(collectionPath).document(documentId)
-        val conversation = ConversationData(conversationId = documentId,ConvoType.ONLINE)
+        val docRef = db.collection("chats").document(generateConsistentHashedId(mainUser.id,contactID))
+        val conversation = ConversationData(conversationId = generateConsistentHashedId(mainUser.id,contactID), ConvoType.ONLINE, ChatType.DUO,listOf(
+            mainUser.id),null,null)
 
         docRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     // Document exists, retrieve the current members list
                     val currentMembers = document.get("members") as? MutableList<String> ?: mutableListOf()
-                    if (!currentMembers.contains(userID)) {
+                    if (!currentMembers.contains(mainUser.id)) {
                         // Add userID if it's not already in the list
-                        currentMembers.add(userID)
+                        currentMembers.add(mainUser.id)
                         docRef.update("members", currentMembers)
                             .addOnSuccessListener {
-                                Log.d("checkfs", "UserID added to existing document")
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Contact successfully added.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 lifecycleScope.launch {
                                     appDao.insertConversation(conversation)
-                                    addContact(appDao, contactID, document.id, ConvoType.BLUETOOTH)
+                                    addContactOnline(appDao, contactID)
+                                }
+                                activity?.runOnUiThread {
+                                    val animator = ValueAnimator.ofInt(screenHeight, 0)
+                                    animator.addUpdateListener { valueAnimator ->
+                                        // Update the peek height of the first bottom sheet during the animation.
+                                        val height = valueAnimator.animatedValue as Int
+                                        eventSheet.peekHeight = height
+                                    }
+                                    animator.duration = 300  // Set the duration of the animation.
+                                    animator.start()  // Start the animation.
                                 }
                             }
                             .addOnFailureListener { e ->
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Failed to add contact. Please try again.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 Log.d("checkfs", "Error updating document: $e")
                             }
                     } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Contact is already in your list.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         Log.d("checkfs", "UserID already exists in the document")
                     }
-                } else {
+                }
+                else {
                     // Document does not exist, create it with userID in the members list
-                    val data = mapOf("members" to listOf(userID))
+                    val data = mapOf("members" to listOf(mainUser.id))
                     docRef.set(data)
                         .addOnSuccessListener {
-                            Log.d("checkfs", "Document created successfully with userID in members list")
+                            Toast.makeText(
+                                requireContext(),
+                                "New contact created successfully.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             lifecycleScope.launch {
                                 appDao.insertConversation(conversation)
-                                addContact(appDao, contactID, document.id, ConvoType.BLUETOOTH)
+                                addContactOnline(appDao, contactID)
+                            }
+                            activity?.runOnUiThread {
+                                val animator = ValueAnimator.ofInt(screenHeight, 0)
+                                animator.addUpdateListener { valueAnimator ->
+                                    // Update the peek height of the first bottom sheet during the animation.
+                                    val height = valueAnimator.animatedValue as Int
+                                    eventSheet.peekHeight = height
+                                }
+                                animator.duration = 300  // Set the duration of the animation.
+                                animator.start()  // Start the animation.
                             }
                         }
                         .addOnFailureListener { e ->
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to create contact. Please try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             Log.d("checkfs", "Error creating document: $e")
                         }
                 }
             }
             .addOnFailureListener { e ->
+                Toast.makeText(
+                    requireContext(),
+                    "Unable to fetch contact details. Check your connection and try again.",
+                    Toast.LENGTH_LONG
+                ).show()
                 Log.d("checkfs", "Error fetching document: $e")
             }
     }
@@ -457,9 +622,6 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
         Log.d("sqdfqijfozsef", hashBytes.joinToString("") { "%02x".format(it) } )
         return hashBytes.joinToString("") { "%02x".format(it) } // Convert to hex string
     }
-
-
-
 
 
 
@@ -830,18 +992,20 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
     @SuppressLint("MissingPermission")
     private inner class AcceptThread : Thread() {
 
-        // Create the server socket lazily
         private val mmServerSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
             bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(
                 bluetoothAdapter!!.name, mUUID
             )
         }
 
+        @Volatile
+        private var isRunning = false // Tracks whether the thread is running
+
         override fun run() {
+            isRunning = true // Mark the thread as running
             var shouldLoop = true
 
-            while (shouldLoop) {
-                // Establish a connection with a BluetoothSocket
+            while (shouldLoop && isRunning) {
                 val socket: BluetoothSocket? = try {
                     Log.d(TAG, "AcceptThread: Waiting for incoming connections...")
                     mmServerSocket?.accept() // Blocking call until a connection is established or fails
@@ -851,10 +1015,8 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
                     null
                 }
 
-                // When a connection is accepted
                 socket?.also { bluetoothSocket ->
                     Log.i(TAG, "AcceptThread: Connection accepted with device ${bluetoothSocket.remoteDevice.name}")
-                    // Manage the connection in a separate thread
                     try {
                         manageServerSocketConnection(bluetoothSocket)
                     } catch (e: Exception) {
@@ -864,23 +1026,29 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
 
                     try {
                         Log.d(TAG, "AcceptThread: Closing server socket after successful connection")
-                        mmServerSocket?.close() // Close the server socket after accepting the connection
+                        mmServerSocket?.close()
                     } catch (e: IOException) {
                         Log.e(TAG, "AcceptThread: Could not close the server socket", e)
                     }
                     shouldLoop = false
                 }
             }
+
+            isRunning = false // Mark the thread as not running
             Log.d(TAG, "AcceptThread: Thread exiting")
         }
 
-        // Closes the connect socket and causes the thread to finish.
         fun cancel() {
-            try {
-                Log.d(TAG, "AcceptThread: Canceling and closing the server socket")
-                mmServerSocket?.close()
-            } catch (e: IOException) {
-                Log.e(TAG, "AcceptThread: Could not close the connect socket", e)
+            if (isRunning) { // Check if the thread is running before attempting to cancel
+                try {
+                    Log.d(TAG, "AcceptThread: Canceling and closing the server socket")
+                    isRunning = false // Stop the thread
+                    mmServerSocket?.close()
+                } catch (e: IOException) {
+                    Log.e(TAG, "AcceptThread: Could not close the connect socket", e)
+                }
+            } else {
+                Log.d(TAG, "AcceptThread: Already not running, no need to cancel")
             }
         }
     }
@@ -920,7 +1088,7 @@ class ContactsPage : Fragment(R.layout.fragment_contacts_page) {
                             ConvoType.BLUETOOTH
                         )
                         addBtContact(appDao,receivedUserData.BTID!!,newContact)
-                        val conversation = ConversationData(convoid, ConvoType.BLUETOOTH)
+                        val conversation = ConversationData(convoid, ConvoType.BLUETOOTH, ChatType.DUO, listOf(mainUser.id, receivedUserData.id),null,null)
                         appDao.insertConversation(conversation)
                         updateContactsList()
                         val animator = ValueAnimator.ofInt(screenHeight, 0)

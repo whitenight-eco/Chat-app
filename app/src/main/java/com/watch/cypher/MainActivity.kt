@@ -29,11 +29,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.navigation.NavigationBarView
 import com.watch.cypher.R
 import com.watch.cypher.dataManager.AppDatabase
 import com.watch.cypher.dataModel.UserData
 import com.watch.cypher.databinding.ActivityMainBinding
+import com.watch.cypher.fragments.ChatsPage
 import com.watch.cypher.fragments.ContactsPage
+import com.watch.cypher.fragments.FeedPage
 import com.watch.cypher.fragments.StartPage
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -45,6 +48,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val contactsPage: ContactsPage by lazy { ContactsPage() }
     private val startPage: StartPage by lazy { StartPage() }
+    private val feedPage: FeedPage by lazy { FeedPage() }
+    private val chatPage: ChatsPage by lazy { ChatsPage() }
+    private lateinit var itemSelectedListener: NavigationBarView.OnItemSelectedListener
 
     companion object {
         lateinit var mainUser: UserData
@@ -67,6 +73,28 @@ class MainActivity : AppCompatActivity() {
                 showFragment(startPage, "start")
             }
         }
+
+        itemSelectedListener = NavigationBarView.OnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.Contacts -> {
+                    showFragment(contactsPage, "contactsPage")
+                    true
+                }
+
+                R.id.Chats -> {
+                    showFragment(chatPage, "chatPage")
+                    true
+                }
+
+                R.id.Feed -> {
+                    showFragment(feedPage, "feedPage")
+                    true
+                }
+
+                else -> false
+            }
+        }
+        binding.Navbt.setOnItemSelectedListener(itemSelectedListener)
     }
 
     private fun showFragment(fragment: Fragment, tag: String) {

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/bg"
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:id="@+id/sndr"
+        android:transitionName="imageTransition"
+        android:orientation="vertical">
+
+        <!-- Author Information -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/ppss"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardCornerRadius="40dp">
+                <ImageView
+                    android:id="@+id/postpfp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/pfp"/>
+            </androidx.cardview.widget.CardView>
+
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                app:layout_constraintLeft_toRightOf="@id/ppss"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp" />
+            <TextView
+                android:id="@+id/date"
+                android:gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text=""
+                android:textSize="14sp"
+                app:layout_constraintEnd_toStartOf="@+id/option"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="8dp" />
+            <ImageView
+                android:id="@+id/option"
+                android:visibility="gone"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/option"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Post Content -->
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:layout_marginVertical="8dp" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/main"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"/>
+
+        <me.relex.circleindicator.CircleIndicator3
+            android:id="@+id/ci"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="20dp"
+            app:ci_drawable="@drawable/ci"/>
+
+
+        <!-- Like Button and Total Likes -->
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:gravity="start"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <uk.bandev.xplosion.XplosionView
+                    android:id="@+id/heart_animator"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp">
+
+                    <ImageView
+                        android:id="@+id/btn_like"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:tint="@color/white"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/unliked"/>
+
+                </uk.bandev.xplosion.XplosionView>
+                <!-- Total Likes -->
+                <TextView
+                    android:id="@+id/lks"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/comments"
+                android:layout_width="0dp"
+                android:gravity="start"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_margin="5dp"
+                    android:layout_gravity="center"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:tint="@color/white"
+                    android:src="@drawable/comment"
+                    android:id="@+id/btn_comment" />
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#848484"/>
+</LinearLayout>

@@ -9,13 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.watch.cypher.R
-import com.watch.cypher.dataModel.ContactData
+import com.watch.cypher.dataModel.Chats
 
 
-class ContactsAdapter(
+class ChatsAdapter(
     private val context: Context,
-    private var contacts: List<ContactData> = emptyList() // Default to an empty list
-) : RecyclerView.Adapter<UserViewHolder2>() {
+    private var contacts: List<Chats> = emptyList() // Default to an empty list
+) : RecyclerView.Adapter<UserViewHolder4>() {
 
     private lateinit var mListenerA: onItemClickListener
 
@@ -23,7 +23,7 @@ class ContactsAdapter(
         fun onItemClick(position: Int)
     }
 
-    fun setOnItemClickListener(listener: onItemClickListener) {
+    fun setOnItemClickListener(listener: ChatsAdapter.onItemClickListener) {
         mListenerA = listener
     }
 
@@ -31,20 +31,17 @@ class ContactsAdapter(
         return contacts.size // Changed from event to contacts
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder2 {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder4 {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.contact_layout, parent, false)
-        return UserViewHolder2(view, mListenerA)
+            .inflate(R.layout.chat_layout, parent, false)
+        return UserViewHolder4(view, mListenerA)
     }
 
-    fun updateContacts(newContacts: List<ContactData>?) {
-        contacts = newContacts ?: emptyList() // Safely assign the new list or default to empty
-        notifyDataSetChanged() // Notify the adapter that the data has changed
-    }
 
-    override fun onBindViewHolder(holder: UserViewHolder2, position: Int) {
-        val contact = contacts[position] // Get the contact at the current position
+    override fun onBindViewHolder(holder: UserViewHolder4, position: Int) {
+        val contact = contacts[position].contact // Get the contact at the current position
         holder.name.text = contact.username // Display the contact's id
+        holder.msg.text = contacts[position].lastMsg?.content // Display the contact's id
 
         // imageSource will be either the URL (String) or the ByteArray
         val imageSource: Any? = contact.pfpurl ?: contact.pfp
@@ -76,13 +73,13 @@ class ContactsAdapter(
     }
 }
 
-class UserViewHolder2(
+class UserViewHolder4(
     itemView: View,
-    listener: ContactsAdapter.onItemClickListener,
+    listener: ChatsAdapter.onItemClickListener,
 ) : RecyclerView.ViewHolder(itemView) {
 
     val name: TextView = itemView.findViewById(R.id.userID)
-
+    val msg: TextView = itemView.findViewById(R.id.lastMsg)
     val img: ImageView = itemView.findViewById(R.id.img)
     init {
         itemView.setOnClickListener {

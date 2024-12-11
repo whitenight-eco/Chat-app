@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/Contacts"
+        android:icon="@drawable/contacts"
+        android:title="Contacts" />
+    <item
+        android:id="@+id/Chats"
+        android:icon="@drawable/chats"
+        android:title="Chats" />
+    <item
+        android:id="@+id/Feed"
+        android:icon="@drawable/notifications"
+        android:title="Feed"/>
+
+
+</menu>

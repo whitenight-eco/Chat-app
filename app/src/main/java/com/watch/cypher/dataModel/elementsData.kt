@@ -6,13 +6,14 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.firebase.Timestamp
 import kotlinx.parcelize.Parcelize
 
 
 @Entity(tableName = "user")
 data class UserData(
-    @PrimaryKey val id: String,
-    val username: String,
+    @PrimaryKey val id: String = "",
+    val username: String = "",
     var BTID: String? = null,
     val pfpurl: String? = null,
     val pfp: ByteArray? = null // Using ByteArray for profile picture
@@ -58,8 +59,11 @@ data class ContactData(
 @Entity(tableName = "conversations")
 data class ConversationData(
     @PrimaryKey val conversationId: String,
-    val conversationType: ConvoType
-    // Additional fields like "title" or "participants" can be added here
+    val conversationType: ConvoType,
+    val chatType: ChatType,
+    val members: List<String>? = null,
+    val chatName: String? = null,
+    val chatImage: String? = null
 )
 
 @Entity(
@@ -132,6 +136,10 @@ enum class ConvoType {
     BLUETOOTH, ONLINE
 }
 
+enum class ChatType {
+    DUO, GROUP
+}
+
 data class PollData(
     val title: String,
     val options: List<String>,
@@ -150,4 +158,37 @@ data class btData(
     val addres: String,
     val device: BluetoothDevice
 )
+
+
+data class UserData2(
+    @PrimaryKey val id: String = "",
+    val username: String = "",
+    val pfpurl: String? = null,
+)
+
+data class PostData(
+    val postID: String = "",
+    val authorID: String = "",
+    val author: UserData2 = UserData2(), // Assuming UserData2 also has a default constructor
+    val content: String = "",
+    val createdAt: Timestamp = Timestamp.now(),
+    val likes: List<Like> = emptyList(),
+    val media: MutableList<Media> = mutableListOf()
+)
+
+data class Media (
+    val url: String? = null,
+    val type: String? = null
+)
+data class Like (
+     val author: String,
+     val post: String
+ )
+
+
+data class Chats(
+    val contact: ContactData,
+    val lastMsg: MessageData?
+)
+
 

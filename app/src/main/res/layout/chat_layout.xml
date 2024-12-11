@@ -49,6 +49,17 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="14dp"/>
+            <TextView
+                android:id="@+id/lastMsg"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_gravity="top"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12dp"/>
 
 
         </LinearLayout>

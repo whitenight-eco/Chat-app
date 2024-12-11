@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.adapters)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.core.animation)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -93,6 +94,11 @@ dependencies {
 
     implementation ("com.github.massoudss:waveformSeekBar:5.0.2")
     implementation ("com.github.lincollincol:amplituda:2.2.2")
+    implementation ("uk.bandev:xplosion:1.0.7")
+    implementation ("me.relex:circleindicator:2.1.6")
+
+    //vidplayer
+    implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
 
 
 }

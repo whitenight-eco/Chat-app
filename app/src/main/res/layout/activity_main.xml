@@ -9,10 +9,46 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/MNavbt"
         android:layout_height="0dp"
         android:background="@color/bg"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/screensholder"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/MNavbt"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardElevation="5dp"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:background="#B3B3B3"
+                android:layout_height="0.5dp"
+                tools:ignore="Suspicious0dp" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/Navbt"
+                style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#13232C"
+                android:backgroundTint="#13232C"
+                android:visibility="visible"
+                app:compatShadowEnabled="true"
+                app:elevation="20dp"
+                app:itemHorizontalTranslationEnabled="true"
+                app:itemIconSize="20dp"
+                app:itemIconTint="@color/selector4"
+                app:itemTextColor="@color/selector4"
+                app:labelVisibilityMode="labeled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:menu="@menu/nav" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

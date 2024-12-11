@@ -18,6 +18,17 @@ class Converters {
     }
 
     @TypeConverter
+    fun fromList(value: List<String>?): String? {
+        return gson.toJson(value)
+    }
+
+    @TypeConverter
+    fun toList(value: String?): List<String>? {
+        val listType = object : TypeToken<List<String>>() {}.type
+        return gson.fromJson(value, listType)
+    }
+
+    @TypeConverter
     fun fromEventData(event: EventData?): String? {
         return gson.toJson(event)
     }
@@ -26,4 +37,5 @@ class Converters {
     fun toEventData(data: String?): EventData? {
         return gson.fromJson(data, object : TypeToken<EventData?>() {}.type)
     }
+
 }

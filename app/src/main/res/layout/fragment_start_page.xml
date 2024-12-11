@@ -11,6 +11,7 @@
 
     <LinearLayout
         android:id="@+id/first"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -49,16 +50,60 @@
     <LinearLayout
         android:id="@+id/second"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:weightSum="1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/startBtn"
         android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/edtimg"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_gravity="center_horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="150dp"
+                android:layout_gravity="center"
+                android:layout_height="150dp"
+                app:cardCornerRadius="150dp">
+                <ImageView
+                    android:id="@+id/pfp"
+                    android:src="@drawable/pfp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Second CardView with transparency -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/edits"
+                android:layout_width="150dp"
+                android:layout_gravity="center"
+                android:layout_height="150dp"
+                app:cardCornerRadius="150dp"
+                android:alpha="0.5"> <!-- Adjust alpha for transparency -->
+
+                <ImageView
+                    android:id="@+id/edt"
+                    android:padding="10dp"
+                    android:src="@drawable/addimg"
+                    app:tint="@color/bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </androidx.cardview.widget.CardView>
+
+        </FrameLayout>
+
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:textSize="16dp"
+            android:layout_marginTop="100dp"
             android:textColor="@color/white"
-            android:layout_margin="25dp"
+            android:layout_marginHorizontal="16dp"
             android:fontFamily="@font/poppins_bold"
             android:text="Enter a username"/>
 

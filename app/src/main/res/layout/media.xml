@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
+    app:cardCornerRadius="8dp"
+    android:layout_margin="5dp"
+    app:cardElevation="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="120dp"
+        android:adjustViewBounds="true"
+        android:layout_height="120dp">
+
+        <ImageView
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            />
+        <ImageView
+            android:id="@+id/vid"
+            android:visibility="gone"
+            android:padding="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/video"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            />
+
+        <ImageView
+            android:id="@+id/remove"
+            android:layout_gravity="end"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/remove"
+            android:adjustViewBounds="true"
+            />
+    </FrameLayout>
+
+
+</androidx.cardview.widget.CardView>

@@ -39,6 +39,9 @@ interface AppDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertContact(contact: ContactData)
 
+    @Query("SELECT id FROM contacts")
+    suspend fun getAllContactIds(): List<String>
+
     @Query("SELECT * FROM contacts WHERE id = :contactId LIMIT 1")
     suspend fun getContactById(contactId: String): ContactData?
 
@@ -66,6 +69,10 @@ interface AppDao {
 
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY timestamp ASC")
     suspend fun getMessagesForConversation(conversationId: String): List<MessageData>
+
+    // Fetch the last message of a specific conversation ordered by timestamp (descending)
+    @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLastMessageByConversation(conversationId: String): MessageData?
 
     @Delete
     suspend fun deleteConversation(conversation: ConversationData)

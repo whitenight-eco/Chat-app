@@ -85,6 +85,8 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -133,6 +135,7 @@
                     android:textColor="@color/white"/>
 
                 <RadioGroup
+                    android:id="@+id/radioGroupe"
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -169,6 +172,146 @@
                 </RadioGroup>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/onlineLayout"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. Exchange IDs with your contact"
+                    android:paddingTop="3dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="start"
+                    android:textSize="12dp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Give below ID to your contact"
+                    android:paddingTop="3dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="start"
+                    android:textSize="12dp"
+                    android:textColor="@color/white" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="10dp"
+                    android:layout_margin="20dp"
+                    android:layout_height="50dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/idHolder"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="20dp"
+                            android:layout_height="match_parent"
+                            android:text="zqdi879kjsqs"
+                            android:paddingTop="3dp"
+                            android:fontFamily="@font/poppins_bold"
+                            android:gravity="center_vertical"
+                            android:textSize="12dp"
+                            android:textColor="#007AFE" />
+
+                        <ImageView
+                            android:id="@+id/copybtn"
+                            android:layout_margin="10dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/copy"
+                            tools:ignore="MissingConstraints" />
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2. Enter links from your contact"
+                    android:paddingTop="3dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="start"
+                    android:textSize="12dp"
+                    android:textColor="@color/white" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/white"
+                    android:layout_margin="20dp"
+                    android:layout_height="50dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/idLayout"
+                        android:layout_width="match_parent"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                        android:layout_height="match_parent"
+                        app:boxStrokeColor="@color/selector2"
+                        app:hintTextColor="@color/white"
+                        app:hintAnimationEnabled="false"
+                        android:hint="Enter link from your contact here"
+                        android:textColorHint="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/idEt"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textColor="@color/black"
+                            android:paddingTop="6dp"
+                            android:gravity="center"
+                            android:textSize="12dp"
+                            android:fontFamily="@font/poppins_regular"
+                            android:textCursorDrawable="@null"
+                            android:inputType="text"
+                            android:maxLines="1"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addctBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="@color/blue"
+                    android:text="Add Contact"
+                    android:textColor="@color/bg"
+                    android:padding="10dp"
+                    android:fontFamily="@font/urbanist"
+                    android:textStyle="bold"
+                    android:textSize="14dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginHorizontal="50dp"/>
+
+
+            </LinearLayout>
+
+
 
             <LinearLayout
                 android:id="@+id/btqrLayout"
@@ -236,6 +379,7 @@
 
             <LinearLayout
                 android:id="@+id/btscLayout"
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">

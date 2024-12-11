@@ -18,6 +18,7 @@ swiperefreshlayout = "1.1.0"
 lottie = "6.0.0"
 qr-scanner = "4.3.0"
 coreAnimation = "1.0.0"
+firebaseStorage = "21.0.1"
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +37,7 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 qr-scanner = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "qr-scanner" }
 androidx-core-animation = { group = "androidx.core", name = "core-animation", version.ref = "coreAnimation" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
