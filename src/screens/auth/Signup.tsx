@@ -1,0 +1,292 @@
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/Feather';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {RSA} from 'react-native-rsa-native';
+import {sha256} from 'react-native-sha256';
+import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
+
+import useHNavigation from 'src/hooks/useHNavigation';
+import Layout from 'src/components/Layout';
+import Card from 'src/components/Card';
+import {Button} from 'src/components/Button/Button';
+import {AuthInput} from 'src/components/Form';
+
+interface ValuesType {
+  username: string;
+  password: string;
+  password2: string;
+}
+
+const initialValues: ValuesType = {username: '', password: '', password2: ''};
+
+const SignupSchema = Yup.object().shape({
+  username: Yup.string().min(2, 'Too Short!').required('Required'),
+  password: Yup.string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(12, 'Password must not exceed 12 characters')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/,
+      'Password must be 8-12 characters and include at least one letter, one number, and one special character',
+    )
+    .required('Required'),
+  password2: Yup.string()
+    .oneOf([Yup.ref('password')], "Password doesn't match")
+    .required('Required'),
+});
+
+const Signup = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(false);
+
+  const navigation = useHNavigation();
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => {
+    navigation.navigate('Login');
+    setVisible(false);
+  };
+
+  const handleSignUp = async (values: ValuesType) => {
+    try {
+      // Check if the private key already exists in local storage
+      const existingPrivateKey = await AsyncStorage.getItem('privateKey');
+
+      if (existingPrivateKey) {
+        // If the private key exists, show an alert and navigate to the login page
+        Alert.alert(
+          'Account already exists',
+          'You already have an account. Please login.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.navigate('Login');
+              },
+            },
+          ],
+        );
+        return; // Stop further execution if private key exists
+      }
+
+      // Generate key pair
+      const keys = await RSA.generateKeys(2048);
+      const {private: privateKey, public: publicKey} = keys;
+
+      // Save private key to local storage
+      await AsyncStorage.setItem('privateKey', privateKey);
+
+      // Hash the password before storing it (using SHA256)
+      const hashedPassword = await sha256(values.password);
+
+      // Save password to local storage
+      await AsyncStorage.setItem('password', hashedPassword);
+
+      // Save public key in Realtime Database
+      // const userRef = database().ref('users').push();
+      // await userRef.set({
+      //   username: values.username,
+      //   publicKey,
+      // });
+
+      // Save public key in FireStore
+      await firestore().collection('users').add({
+        username: values.username,
+        publicKey,
+        createdDate: moment().toISOString(),
+      });
+
+      showModal();
+    } catch (error) {
+      console.error('Error during signup:', error);
+      Alert.alert('Error', 'Something went wrong during signup.');
+    }
+  };
+
+  return (
+    <Layout>
+      <ScrollView contentContainerStyle={styles.scrollview}>
+        <View style={styles.container}>
+          <Card style={styles.formWrapper}>
+            <Text style={styles.headline}>Create Your Account</Text>
+            <Text style={styles.description}>
+              Please complete all required field
+            </Text>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={SignupSchema}
+              onSubmit={handleSignUp}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <>
+                  <AuthInput
+                    testID="Signup.Username"
+                    iconName="user-circle"
+                    placeholder="What should be your name"
+                    onChangeText={handleChange('username')}
+                    onBlur={handleBlur('username')}
+                    value={values.username}
+                    keyboardType="email-address"
+                    error={
+                      errors.username && touched.username ? errors.username : ''
+                    }
+                  />
+                  <AuthInput
+                    testID="Signup.Password"
+                    iconName="lock"
+                    placeholder="Password"
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    value={values.password}
+                    secureTextEntry
+                    error={
+                      errors.password && touched.password ? errors.password : ''
+                    }
+                  />
+                  <AuthInput
+                    testID="Signup.Password"
+                    iconName="lock"
+                    placeholder="Confirm password"
+                    onChangeText={handleChange('password2')}
+                    onBlur={handleBlur('password2')}
+                    value={values.password2}
+                    secureTextEntry
+                    error={
+                      errors.password2 && touched.password2
+                        ? errors.password2
+                        : ''
+                    }
+                  />
+                  <Text style={styles.description2}>
+                    A strong password helps prevent unauthorized access.
+                  </Text>
+                  <View style={styles.buttonWrapper}>
+                    <Button
+                      style={styles.button}
+                      text="Submit"
+                      isLoading={loading}
+                      onPress={handleSubmit}
+                    />
+                  </View>
+                </>
+              )}
+            </Formik>
+          </Card>
+        </View>
+
+        <Modal
+          isVisible={visible}
+          onBackdropPress={hideModal}
+          backdropOpacity={1.0}
+          style={styles.modal}
+          animationIn="zoomInUp"
+          animationOut="zoomOut">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalIconWrapper}>
+              <Icon name="check" size={70} color="#FFFDFD" />
+            </View>
+            <Text style={styles.modalHealine}>Account created</Text>
+            <TouchableOpacity onPress={hideModal} activeOpacity={0.8}>
+              <Text style={styles.modalDescription}>Login to your account</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </ScrollView>
+    </Layout>
+  );
+};
+
+export default Signup;
+
+const styles = StyleSheet.create({
+  scrollview: {
+    flexGrow: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  formWrapper: {
+    width: '100%',
+  },
+  headline: {
+    color: '#FFFFFF',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 24,
+  },
+  description: {
+    marginTop: -5,
+    color: '#D2D2D2',
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    marginBottom: 20,
+  },
+  description2: {
+    color: '#D2D2D2',
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+  },
+  buttonWrapper: {
+    paddingHorizontal: 20,
+  },
+  button: {
+    marginTop: 130,
+    marginBottom: 20,
+    backgroundColor: '#05FCFC',
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 0, // Removes default margin around modal
+  },
+  modalContainer: {
+    width: '80%',
+    height: '35%',
+    backgroundColor: '#131212',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalIconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
+    height: 100,
+    backgroundColor: '#000',
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#25FFAE',
+    marginBottom: 20,
+  },
+  modalHealine: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 24,
+    color: '#FFF',
+    marginBottom: 15,
+  },
+  modalDescription: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 14,
+    color: '#F2F2F2',
+    marginBottom: 30,
+  },
+});
