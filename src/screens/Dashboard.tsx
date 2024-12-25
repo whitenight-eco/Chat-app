@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
+import Card from 'src/components/Card';
 import {Button} from 'src/components/Button/Button';
 
 const Dashboard = () => {
@@ -22,35 +23,37 @@ const Dashboard = () => {
     <Layout>
       <ScrollView contentContainerStyle={styles.scrollview}>
         <View style={styles.container}>
-          <Text style={styles.headline}>
-            Secure messaging and Stay connected even Offline!
-          </Text>
-          <View style={styles.descriptionWrapper}>
-            <Icon name="arrow-forward" size={30} color="#FFF" />
-            <Text style={styles.description}>
-              Experience seamless communication. Cypher enables peer-to-peer
-              (P2P) communication. Thanks to Bluetooth connection for ensuring
-              communication continuity, empower us to communicate more freely
-              and securely.
+          <Card style={styles.formWrapper}>
+            <Text style={styles.headline}>
+              Secure messaging and Stay connected even Offline!
             </Text>
-          </View>
-        </View>
-        <View style={styles.lineWrapper}>
-          <View style={styles.line} />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button
-            style={styles.loginButton}
-            text="Login"
-            isLoading={loading}
-            onPress={gotoLogin}
-          />
-          <Button
-            style={styles.signButton}
-            text="Sign"
-            isLoading={loading}
-            onPress={gotoSign}
-          />
+            <View style={styles.descriptionWrapper}>
+              <Icon name="arrow-forward" size={30} color="#FFF" />
+              <Text style={styles.description}>
+                Experience seamless communication. Cypher enables peer-to-peer
+                (P2P) communication. Thanks to Bluetooth connection for ensuring
+                communication continuity, empower us to communicate more freely
+                and securely.
+              </Text>
+            </View>
+            <View style={styles.lineWrapper}>
+              <View style={styles.line} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <Button
+                style={styles.loginButton}
+                text="Login"
+                isLoading={loading}
+                onPress={gotoLogin}
+              />
+              <Button
+                style={styles.signButton}
+                text="Sign"
+                isLoading={loading}
+                onPress={gotoSign}
+              />
+            </View>
+          </Card>
         </View>
       </ScrollView>
     </Layout>
@@ -65,27 +68,31 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    marginTop: 170,
+  },
+  formWrapper: {
+    width: '100%',
   },
   headline: {
-    color: '#ffffff',
+    color: '#FFF',
     fontFamily: 'Poppins-Bold',
-    fontSize: 35,
-    marginBottom: 60,
+    fontSize: 32, //35
+    marginBottom: 30,
   },
   descriptionWrapper: {
     flexDirection: 'row',
     width: '100%',
-    paddingRight: 20,
-    gap: 12,
+    gap: 10,
+    marginBottom: 100,
+    flexWrap: 'wrap',
   },
   description: {
-    color: '#ffffff',
+    color: '#FFF',
     fontFamily: 'Poppins-Regular',
     lineHeight: 27,
-    fontSize: 16,
+    fontSize: 14, //16
+    flex: 1,
   },
   lineWrapper: {
     alignItems: 'center',
@@ -98,15 +105,15 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     gap: 10,
-    marginVertical: 35,
-    paddingHorizontal: 22
+    marginVertical: 20,
+    paddingHorizontal: 20,
   },
   loginButton: {
     flex: 7,
     backgroundColor: '#FFFFFF',
   },
   signButton: {
-    flex: 1,
+    flex: 2,
     backgroundColor: '#05FCFC',
   },
 });

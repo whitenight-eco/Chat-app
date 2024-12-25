@@ -23,12 +23,12 @@ export default Card;
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    paddingHorizontal: spacing.layoutPaddingH,
-    paddingVertical: spacing.layoutPaddingH,
-    borderWidth: StyleSheet.hairlineWidth,
+    // paddingHorizontal: spacing.layoutPaddingH,
+    // paddingVertical: spacing.layoutPaddingH,
+    // borderWidth: StyleSheet.hairlineWidth,
     borderRadius: spacing.borderRadius,
     backgroundColor: '#000',
-    // borderColor: '#ffffff',
+    borderColor: '#000',
   },
 });
 

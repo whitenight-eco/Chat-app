@@ -48,7 +48,7 @@ const DrawerNavigator = () => {
               size={18}
               color={theme.color}
               onPress={() => navigation.toggleDrawer()}
-              style={{backgroundColor: theme.cardBg}}
+              style={{backgroundColor: 'white'}}
             />
           ),
         })}

@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   formWrapper: {
     width: '100%',
