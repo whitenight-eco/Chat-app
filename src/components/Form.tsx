@@ -41,7 +41,6 @@ const AuthInput = ({
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           style={[
             styles.input,
-            {color: theme.color, borderColor: theme.layoutBg},
             {...style},
           ]}
         />
@@ -85,6 +84,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     fontFamily: 'Poppins-Regular',
     fontSize: 12,
+    color: '#000',
   },
   iconContainer: {
     marginLeft: 10,

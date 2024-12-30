@@ -4,14 +4,18 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {sha256} from 'react-native-sha256';
+import {observer} from 'mobx-react';
+
+import ProfileStore from 'src/store/ProfileStore';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
 import Card from 'src/components/Card';
 import {Button} from 'src/components/Button/Button';
 import {AuthInput} from 'src/components/Form';
+
+import Utils from 'src/utils/Utils';
 
 interface ValuesType {
   password: string;
@@ -37,16 +41,19 @@ const Login = () => {
   const navigation = useHNavigation();
 
   const hideloginSuccessModalModal = () => {
-    navigation.navigate('Home');
     setloginSuccessModalVisible(false);
+    navigation.navigate('Home');
   };
 
   const handleLogin = async (values: ValuesType) => {
-    //
+    setLoading(true);
     try {
       // Retrieve private key from local storage
-      const privateKey = await AsyncStorage.getItem('privateKey');
-      if (!privateKey) {
+      const privateKey = await Utils.getString('privateKey');
+      const publicKey = await Utils.getString('publicKey');
+      const username = await Utils.getString('username');
+
+      if (!privateKey || !username) {
         Alert.alert('Not registered', 'Please sign up first.', [
           {
             text: 'OK',
@@ -59,7 +66,7 @@ const Login = () => {
       }
 
       // Step 1: Retrieve the stored hashed password from local storage
-      const storedHashedPassword = await AsyncStorage.getItem('password');
+      const storedHashedPassword = await Utils.getString('password');
       if (!storedHashedPassword) {
         Alert.alert('Error', 'No password found. Please sign up first.');
         return;
@@ -69,8 +76,8 @@ const Login = () => {
       const hashedPassword = await sha256(values.password);
 
       // Retrieve failed login attempts and lockout timestamp
-      const failedAttempts = await AsyncStorage.getItem('failedAttempts');
-      const lastFailedTime = await AsyncStorage.getItem('lastFailedTime');
+      const failedAttempts = await Utils.getString('failedAttempts');
+      const lastFailedTime = await Utils.getString('lastFailedTime');
 
       const failedAttemptsCount = failedAttempts ? parseInt(failedAttempts) : 0;
       const lastFailedTimestamp = lastFailedTime ? parseInt(lastFailedTime) : 0;
@@ -93,15 +100,27 @@ const Login = () => {
 
       // Step 3: Compare the entered hashed password with the stored hashed password
       if (hashedPassword === storedHashedPassword) {
-        setloginSuccessModalVisible(true);
         // Reset failed attempts after successful login
-        await AsyncStorage.setItem('failedAttempts', '0');
+        await Utils.storeString('failedAttempts', '0');
+        const userLoginData = {
+          username: username,
+          password: hashedPassword,
+          publicKey: publicKey || '',
+        };
+        const result = await ProfileStore.userLogin(userLoginData);
+
+        if (result) {
+          setLoading(false);
+          setloginSuccessModalVisible(true);
+        } else {
+          setLoading(false);
+        }
       } else {
-        await AsyncStorage.setItem(
+        await Utils.storeString(
           'failedAttempts',
           (failedAttemptsCount + 1).toString(),
         );
-        await AsyncStorage.setItem('lastFailedTime', currentTime.toString());
+        await Utils.storeString('lastFailedTime', currentTime.toString());
         Alert.alert('Error', 'Please input correct password.');
       }
     } catch (error) {
@@ -111,7 +130,7 @@ const Login = () => {
   };
 
   const handleForgotPasssword = async () => {
-    await AsyncStorage.clear();
+    await Utils.clearAll();
     setForgotPassModalVisible(false);
     navigation.navigate('Dashboard');
   };
@@ -236,7 +255,7 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default observer(Login);
 
 const styles = StyleSheet.create({
   scrollview: {

@@ -76,7 +76,7 @@ const themes: themesType = {
   dark: {
     name: 'dark',
     text: '#695D5D',
-    color: '#000', 
+    color: '#FFF', 
     primary: '#EF936E',
     layoutBg: '#000',
     cardBg: '#000',

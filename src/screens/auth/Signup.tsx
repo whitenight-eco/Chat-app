@@ -12,7 +12,6 @@ import Icon from 'react-native-vector-icons/Feather';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RSA} from 'react-native-rsa-native';
 import {sha256} from 'react-native-sha256';
 import firestore from '@react-native-firebase/firestore';
@@ -23,6 +22,8 @@ import Layout from 'src/components/Layout';
 import Card from 'src/components/Card';
 import {Button} from 'src/components/Button/Button';
 import {AuthInput} from 'src/components/Form';
+
+import Utils from 'src/utils/Utils';
 
 interface ValuesType {
   username: string;
@@ -60,9 +61,10 @@ const Signup = () => {
   };
 
   const handleSignUp = async (values: ValuesType) => {
+    setLoading(true);
     try {
       // Check if the private key already exists in local storage
-      const existingPrivateKey = await AsyncStorage.getItem('privateKey');
+      const existingPrivateKey = await Utils.getString('privateKey');
 
       if (existingPrivateKey) {
         // If the private key exists, show an alert and navigate to the login page
@@ -85,14 +87,18 @@ const Signup = () => {
       const keys = await RSA.generateKeys(2048);
       const {private: privateKey, public: publicKey} = keys;
 
-      // Save private key to local storage
-      await AsyncStorage.setItem('privateKey', privateKey);
+      // Save private, public keys to local storage
+      await Utils.storeString('privateKey', privateKey);
+      await Utils.storeString('publicKey', publicKey);
 
       // Hash the password before storing it (using SHA256)
       const hashedPassword = await sha256(values.password);
 
       // Save password to local storage
-      await AsyncStorage.setItem('password', hashedPassword);
+      await Utils.storeString('password', hashedPassword);
+
+      // Save username to local storage
+      await Utils.storeString('username', values.username);
 
       // Save public key in Realtime Database
       // const userRef = database().ref('users').push();
@@ -101,14 +107,19 @@ const Signup = () => {
       //   publicKey,
       // });
 
-      // Save public key in FireStore
-      await firestore().collection('users').add({
+      // Save username, public key in FireStore
+      const docRef = await firestore().collection('users').add({
         username: values.username,
         publicKey,
         createdDate: moment().toISOString(),
       });
 
-      showModal();
+      if (docRef.id) {
+        setLoading(false);
+        showModal();
+      } else {
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Error during signup:', error);
       Alert.alert('Error', 'Something went wrong during signup.');

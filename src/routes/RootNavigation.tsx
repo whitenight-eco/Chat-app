@@ -2,9 +2,9 @@ import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createStackNavigator} from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {observer} from 'mobx-react';
 
-import {useTheme} from 'src/theme/useTheme';
+import ProfileStore from 'src/store/ProfileStore';
 
 import SplashScreen from 'react-native-splash-screen';
 import Splash from 'src/screens/onboarding/SplashScreen';
@@ -14,63 +14,30 @@ import Login from 'src/screens/auth/Login';
 import Signup from 'src/screens/auth/Signup';
 
 import ContactsScreen from 'src/screens/contacts/ContactsScreen';
+import ChatsScreen from 'src/screens/chats/ChatsScreen';
+import FeedsScreen from 'src/screens/feeds/FeeedsScreen';
 
 const DrawerNavigator = () => {
   const Drawer = createDrawerNavigator();
-  const {theme} = useTheme();
-
-  const dynamicStyles = {
-    header: {
-      backgroundColor: theme.cardBg,
-    },
-    title: {
-      color: theme.color,
-      lineHeight: 20,
-    },
-    icon: {
-      color: theme.color,
-    },
-  };
 
   const CustomDrawerScreen = (name: string, component: any) => {
-    return (
-      <Drawer.Screen
-        name={name}
-        component={component}
-        options={({navigation}) => ({
-          title: name,
-          headerStyle: dynamicStyles.header,
-          headerTitleStyle: dynamicStyles.title,
-          headerTitleAlign: 'left',
-          headerLeft: () => (
-            <Icon.Button
-              name="menu"
-              size={18}
-              color={theme.color}
-              onPress={() => navigation.toggleDrawer()}
-              style={{backgroundColor: 'white'}}
-            />
-          ),
-        })}
-      />
-    );
+    return <Drawer.Screen name={name} component={component} />;
   };
 
   return (
     <Drawer.Navigator
-      screenOptions={
-        {
-          headerStyle: dynamicStyles.header,
-          headerTitleStyle: dynamicStyles.title,
-        }
-      }>
+      screenOptions={{headerShown: false, swipeEnabled: false}}
+      initialRouteName="Chats">
       {CustomDrawerScreen('Contacts', ContactsScreen)}
+      {CustomDrawerScreen('Chats', ChatsScreen)}
+      {CustomDrawerScreen('Feeds', FeedsScreen)}
     </Drawer.Navigator>
   );
 };
 
-export default function RootNavigation() {
+const RootNavigation = () => {
   const [doneSplash, setDoneSplash] = useState(false);
+  const {isLoggedIn} = ProfileStore;
 
   useEffect(() => {
     SplashScreen.hide();
@@ -81,7 +48,7 @@ export default function RootNavigation() {
   return doneSplash ? (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Dashboard"
+        initialRouteName={isLoggedIn ? 'Home' : 'Dashboard'}
         screenOptions={{
           headerShown: false,
         }}>
@@ -98,4 +65,6 @@ export default function RootNavigation() {
   ) : (
     <Splash onFinish={() => setDoneSplash(true)} />
   );
-}
+};
+
+export default observer(RootNavigation);
