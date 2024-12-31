@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createStackNavigator} from '@react-navigation/stack';
 import {observer} from 'mobx-react';
 
@@ -13,27 +12,7 @@ import Dashboard from 'src/screens/Dashboard';
 import Login from 'src/screens/auth/Login';
 import Signup from 'src/screens/auth/Signup';
 
-import ContactsScreen from 'src/screens/contacts/ContactsScreen';
-import ChatsScreen from 'src/screens/chats/ChatsScreen';
-import FeedsScreen from 'src/screens/feeds/FeeedsScreen';
-
-const DrawerNavigator = () => {
-  const Drawer = createDrawerNavigator();
-
-  const CustomDrawerScreen = (name: string, component: any) => {
-    return <Drawer.Screen name={name} component={component} />;
-  };
-
-  return (
-    <Drawer.Navigator
-      screenOptions={{headerShown: false, swipeEnabled: false}}
-      initialRouteName="Chats">
-      {CustomDrawerScreen('Contacts', ContactsScreen)}
-      {CustomDrawerScreen('Chats', ChatsScreen)}
-      {CustomDrawerScreen('Feeds', FeedsScreen)}
-    </Drawer.Navigator>
-  );
-};
+import TabNavigator from 'src/screens/navigator';
 
 const RootNavigation = () => {
   const [doneSplash, setDoneSplash] = useState(false);
@@ -54,7 +33,7 @@ const RootNavigation = () => {
         }}>
         <Stack.Screen
           name="Home"
-          component={DrawerNavigator}
+          component={TabNavigator}
           options={{headerShown: false, title: 'Home'}}
         />
         <Stack.Screen name="Dashboard" component={Dashboard} />
