@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 
 import Layout from 'src/screens/Layout';
-import ChatsHeader from './ChatsHeader';
+import CommonHeader from 'src/components/CommonHeader';
 
 const chats = [
   {
@@ -67,7 +67,7 @@ const ChatsScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <ChatsHeader />
+        <CommonHeader name="Chats" iconExist={true} />
 
         {/* chat List */}
         <FlatList

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TextInput, FlatList, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import Layout from 'src/screens/Layout';
-import ContactsHeader from './ContactsHeader';
+import {useDebounce} from 'use-debounce';
 
-const contacts = [
+import Layout from 'src/screens/Layout';
+import {IContactsType} from 'src/types/contacts';
+import CommonHeader from 'src/components/CommonHeader';
+
+const contacts: IContactsType[] = [
   {
     id: '1',
     name: 'Adina Nurrahma',
@@ -27,7 +30,18 @@ const contacts = [
 ];
 
 const ContactsScreen = () => {
-  const renderItem = ({item}: {item: (typeof contacts)[0]}) => (
+  const [searchItem, setSearchItem] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchItem, 300);
+  const [filteredUsers, setFilteredUsers] = useState(contacts);
+
+  useEffect(() => {
+    const filteredItems = contacts.filter(user =>
+      user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+    );
+    setFilteredUsers(filteredItems);
+  }, [debouncedSearchTerm]);
+
+  const renderItem = ({item}: {item: IContactsType}) => (
     <View style={styles.contactItem}>
       <View style={styles.imageContainer}>
         <Image source={{uri: item.image}} style={styles.contactImage} />
@@ -45,7 +59,7 @@ const ContactsScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <ContactsHeader />
+        <CommonHeader name="Contacts" iconExist={true} />
 
         {/* Search Bar */}
         <View style={styles.searchBar}>
@@ -53,6 +67,8 @@ const ContactsScreen = () => {
             placeholder=""
             placeholderTextColor="#888"
             style={styles.searchInput}
+            value={searchItem}
+            onChangeText={setSearchItem}
           />
           <Icon
             name="search"
@@ -64,7 +80,7 @@ const ContactsScreen = () => {
 
         {/* Contact List */}
         <FlatList
-          data={contacts}
+          data={filteredUsers}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.contactList}

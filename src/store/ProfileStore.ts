@@ -6,12 +6,14 @@ import {IUser, IUserLogin} from './types';
 class ProfileStore {
   user: IUser | null = null;
   firstLogin: boolean = false;
+  externalLink: string = '';
 
   constructor() {
     makeObservable(this, {
       // observeralble variables
       user: observable,
       firstLogin: observable,
+      externalLink: observable,
 
       // action functions
       isLoggedIn: computed,
@@ -32,6 +34,7 @@ class ProfileStore {
 
   async userLogin(data: IUserLogin) {
     try {
+      const externalLink = await Utils.getString('externalLink');
       const snapshot = await firestore()
         .collection('users')
         .where('username', '==', data.username)
@@ -51,6 +54,7 @@ class ProfileStore {
 
           runInAction(() => {
             this.user = userInfo;
+            this.externalLink = externalLink || '';
           });
         });
         return true;

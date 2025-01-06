@@ -1,12 +1,13 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {View} from 'react-native';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
+import {View, StyleSheet, ViewStyle} from 'react-native';
 
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import ContactsScreen from 'src/screens/contacts';
 import ChatsScreen from 'src/screens/chats';
 import FeedsScreen from 'src/screens/feeds';
+import ContactsStack from './ContactsStack';
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
@@ -77,26 +78,32 @@ const TabNavigator = () => {
     );
   };
 
+  const getTabBarStyle = (route: any): ViewStyle => {
+    const routeName = getFocusedRouteNameFromRoute(route);
+    if (routeName === 'AddContacts' || routeName === 'QrScan' ) {
+      return {display: 'none'};
+    }
+    return {
+      backgroundColor: '#13232C',
+      borderColor: '#000',
+      height: 75,
+      flexDirection: 'column',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+    };
+  };
+
   return (
-    <>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: '#13232C',
-            borderColor: '#000',
-            height: 75,
-            flexDirection: 'column',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-          },
-        }}
-        initialRouteName="Chats">
-        {CustomTabScreen('Contacts', ContactsScreen)}
-        {CustomTabScreen('Chats', ChatsScreen)}
-        {CustomTabScreen('Feeds', FeedsScreen)}
-      </Tab.Navigator>
-    </>
+    <Tab.Navigator
+      screenOptions={({route}) => ({
+        headerShown: false,
+        tabBarStyle: StyleSheet.flatten([getTabBarStyle(route)]),
+      })}
+      initialRouteName="Chats">
+      {CustomTabScreen('Contacts', ContactsStack)}
+      {CustomTabScreen('Chats', ChatsScreen)}
+      {CustomTabScreen('Feeds', FeedsScreen)}
+    </Tab.Navigator>
   );
 };
 

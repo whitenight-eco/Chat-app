@@ -62,6 +62,7 @@ const Login = () => {
             },
           },
         ]);
+        setLoading(false);
         return;
       }
 
@@ -69,6 +70,7 @@ const Login = () => {
       const storedHashedPassword = await Utils.getString('password');
       if (!storedHashedPassword) {
         Alert.alert('Error', 'No password found. Please sign up first.');
+        setLoading(false);
         return;
       }
 
@@ -122,6 +124,7 @@ const Login = () => {
         );
         await Utils.storeString('lastFailedTime', currentTime.toString());
         Alert.alert('Error', 'Please input correct password.');
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error during login:', error);

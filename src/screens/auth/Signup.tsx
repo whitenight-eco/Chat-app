@@ -107,10 +107,16 @@ const Signup = () => {
       //   publicKey,
       // });
 
+      const hashedPbulicKey = await sha256(publicKey);
+      const shortHash = hashedPbulicKey.slice(0, 24);
+      const externalLink = `cypher://${shortHash}`;
+      await Utils.storeString('externalLink', externalLink);
+
       // Save username, public key in FireStore
       const docRef = await firestore().collection('users').add({
         username: values.username,
         publicKey,
+        externalLink: externalLink,
         createdDate: moment().toISOString(),
       });
 
