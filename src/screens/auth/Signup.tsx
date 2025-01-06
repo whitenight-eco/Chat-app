@@ -117,6 +117,7 @@ const Signup = () => {
         username: values.username,
         publicKey,
         externalLink: externalLink,
+        isConnected: true,
         createdDate: moment().toISOString(),
       });
 

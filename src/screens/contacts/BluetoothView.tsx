@@ -1,8 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {View, Text, StyleSheet, Linking} from 'react-native';
 
 import WaringIcon from 'react-native-vector-icons/Ionicons';
 import QRCode from 'react-native-qrcode-svg';
+import BluetoothStateManager from 'react-native-bluetooth-state-manager';
+import {useCameraDevice} from 'react-native-vision-camera';
+import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 
 import {observer} from 'mobx-react';
 import ProfileStore from 'src/store/ProfileStore';
@@ -14,20 +17,75 @@ const BluetoothView = () => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState(ProfileStore.externalLink);
 
-  const [bluetoothOn, setBluetoothOn] = useState(false);
+  const [bluetoothStatus, setBluetoothStatus] = useState('');
   const [error, setError] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
 
   const navigation = useHNavigation();
 
+  const device = useCameraDevice('back');
+  const [cameraPermissionStatus, setCameraPermissionStatus] =
+    useState<CameraPermissionStatus>('not-determined');
+
+  const requestCameraPermission = useCallback(async () => {
+    const permission = await Camera.requestCameraPermission();
+    console.log(`Camera permission status: ${permission}`);
+
+    if (permission === 'denied') await Linking.openSettings();
+    if (permission === 'granted') {
+      navigation.navigate('QrScan');
+    }
+    setCameraPermissionStatus(permission);
+  }, []);
+
+  const openCodeScanner = () => {
+    if (cameraPermissionStatus !== 'granted') {
+      requestCameraPermission();
+    } else {
+      navigation.navigate('QrScan');
+    }
+  };
+
+  useEffect(() => {
+    BluetoothStateManager.getState().then(bluetoothState => {
+      switch (bluetoothState) {
+        case 'Unknown':
+          setErrMsg('Unknown');
+          setBluetoothStatus(bluetoothState);
+          break;
+        case 'Resetting':
+          setBluetoothStatus(bluetoothState);
+          break;
+        case 'Unsupported':
+          setErrMsg('Bluetooth unsupported on this device');
+          setBluetoothStatus(bluetoothState);
+          break;
+        case 'Unauthorized':
+          setErrMsg('This device is Unauthorized');
+          setBluetoothStatus(bluetoothState);
+          break;
+        case 'PoweredOff':
+          setErrMsg('Make sure Bluetooth turn on in connections setting');
+          setBluetoothStatus(bluetoothState);
+          break;
+        case 'PoweredOn':
+          setBluetoothStatus(bluetoothState);
+          break;
+        default:
+          break;
+      }
+    });
+  }, []);
+
   const handleContinue = () => {
     setLoading(true);
-    if (!bluetoothOn) {
-      setLoading(false);
-      setError(true);
-    } else {
+    if (bluetoothStatus === 'PoweredOn') {
       setError(false);
       setLoading(false);
-      navigation.navigate('QrScan');
+      openCodeScanner();
+    } else {
+      setLoading(false);
+      setError(true);
     }
   };
 
@@ -42,9 +100,7 @@ const BluetoothView = () => {
       {error && (
         <View style={styles.errorContainer}>
           <WaringIcon name="warning-outline" size={24} color="#FF0404" />
-          <Text style={styles.errorText}>
-            Make sure Bluetooth turn on in connections setting
-          </Text>
+          <Text style={styles.errorText}>{errMsg}</Text>
         </View>
       )}
 
@@ -98,7 +154,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    marginTop: 175,
+    marginTop: 145,
     marginBottom: 20,
     backgroundColor: '#05FCFC',
   },

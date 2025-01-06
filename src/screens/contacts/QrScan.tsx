@@ -1,17 +1,58 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
+import PowerOffIcon from 'react-native-vector-icons/FontAwesome';
 
 import Layout from 'src/screens/Layout';
 import CommonHeader from 'src/components/CommonHeader';
 import useHNavigation from 'src/hooks/useHNavigation';
+
+import ProfileStore from 'src/store/ProfileStore';
+
+import {
+  Code,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
+import {Camera} from 'react-native-vision-camera';
 
 const QrScanScreen = () => {
   const [connectSuccessModalVisible, setConnectSuccessModalVisible] =
     useState(false);
 
   const navigation = useHNavigation();
+
+  const device = useCameraDevice('back');
+
+  const checkConnection = async (link: any) => {
+    const result = await ProfileStore.checkLink(link);
+    if (result) setConnectSuccessModalVisible(true);
+  };
+
+  const onCodeScanned = useCallback((codes: Code[]) => {
+    const value = codes[0]?.value;
+    console.log(
+      JSON.stringify(
+        [`Scanned ${codes.length} codes:${codes}`, `value: ${value}`],
+        null,
+        2,
+      ),
+    );
+
+    if (value == null) {
+      return;
+    }
+    checkConnection(value);
+  }, []);
+
+  // Initialize the Code Scanner to scan QR code
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr'],
+    onCodeScanned: onCodeScanned,
+  });
+
+  if (!device) return <View />;
 
   const hideConnectSuccessModalModal = () => {
     setConnectSuccessModalVisible(false);
@@ -26,6 +67,20 @@ const QrScanScreen = () => {
         <Text style={styles.description}>
           Scan QR code with another cypher member
         </Text>
+        <View style={styles.cameraWrapper}>
+          <View style={styles.icon}>
+            <PowerOffIcon name="power-off" size={40} color="#CF3010" />
+          </View>
+          <View style={styles.cameraOutline}>
+            <Camera
+              device={device}
+              style={styles.camera}
+              isActive={true}
+              codeScanner={codeScanner}
+              orientation={'portrait'} //export type Orientation = 'portrait' | 'portrait-upside-down' | 'landscape-left' | 'landscape-right'
+            />
+          </View>
+        </View>
       </View>
 
       {/* Connect Success Modal */}
@@ -67,6 +122,34 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 12,
     textAlign: 'center',
+    paddingBottom: 100,
+  },
+  cameraWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    position: 'absolute',
+    top: -30,
+    zIndex: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    backgroundColor: '#FFF',
+    borderRadius: 30,
+  },
+  cameraOutline: {
+    width: 300,
+    height: 300,
+    borderRadius: 40,
+    borderWidth: 40,
+    borderColor: 'white',
+  },
+  camera: {
+    width: '100%',
+    height: '100%',
   },
   modal: {
     justifyContent: 'center',

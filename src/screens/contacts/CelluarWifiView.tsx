@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,22 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/Feather';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import ClipBoardIcon from 'react-native-vector-icons/Feather';
 import WaringIcon from 'react-native-vector-icons/Ionicons';
 
+import {useFocusEffect} from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
+
 import {observer} from 'mobx-react';
 import ProfileStore from 'src/store/ProfileStore';
 
 import {Button} from 'src/components/Button/Button';
+
+import useHNavigation from 'src/hooks/useHNavigation';
 
 const CelluarWifiView = () => {
   const [loading, setLoading] = useState(false);
@@ -24,13 +31,48 @@ const CelluarWifiView = () => {
 
   const [contactLink, setContactLink] = useState('');
   const [error, setError] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
 
-  const handleContinue = () => {
-    if (!contactLink) {
-      setError(true);
+  const [hasInternet, setHasInternet] = useState<boolean>(true);
+
+  const [connectSuccessModalVisible, setConnectSuccessModalVisible] =
+    useState(false);
+
+  const navigation = useHNavigation();
+
+  const hideConnectSuccessModalModal = () => {
+    setConnectSuccessModalVisible(false);
+    navigation.navigate('ContactsMain');
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const netInfoSubscription = NetInfo.addEventListener(state => {
+        setHasInternet(state.isConnected ?? false);
+      });
+      return () => {
+        netInfoSubscription();
+      };
+    }, []),
+  );
+
+  const handleContinue = async () => {
+    setLoading(true);
+    if (hasInternet) {
+      if (!contactLink) {
+        setError(true);
+        setErrMsg('You must both add each other’s links');
+        setLoading(false);
+      } else {
+        setError(false);
+        const result = await ProfileStore.checkLink(contactLink);
+        if (result) setConnectSuccessModalVisible(true);
+        setLoading(false);
+      }
     } else {
-      setError(false);
-      // Alert.alert('Success', 'Contact added successfully!');
+      setError(true);
+      setErrMsg('You are not connected to the Internet.');
+      setLoading(false);
     }
   };
 
@@ -62,9 +104,7 @@ const CelluarWifiView = () => {
       {error && (
         <View style={styles.errorContainer}>
           <WaringIcon name="warning-outline" size={24} color="#FF0404" />
-          <Text style={styles.errorText}>
-            You must both add each other’s links
-          </Text>
+          <Text style={styles.errorText}>{errMsg}</Text>
         </View>
       )}
 
@@ -76,6 +116,24 @@ const CelluarWifiView = () => {
           onPress={handleContinue}
         />
       </View>
+
+      {/* Connect Success Modal */}
+      <Modal
+        isVisible={connectSuccessModalVisible}
+        onBackdropPress={hideConnectSuccessModalModal}
+        backdropOpacity={1.0}
+        style={styles.modal}
+        animationIn="zoomInUp"
+        animationOut="zoomOut">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalIconWrapper}>
+            <Icon name="check" size={70} color="#FFFDFD" />
+          </View>
+          <Text style={styles.modalHealine} numberOfLines={2}>
+            You're now{'\n'}Connected!
+          </Text>
+        </View>
+      </Modal>
     </>
   );
 };
@@ -149,9 +207,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    marginTop: 210,
+    marginTop: 180,
     marginBottom: 20,
     backgroundColor: '#05FCFC',
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 0, // Removes default margin around modal
+  },
+  modalContainer: {
+    width: '80%',
+    height: '35%',
+    backgroundColor: '#131212',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalIconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
+    height: 100,
+    backgroundColor: '#000',
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#25FFAE',
+    marginBottom: 20,
+  },
+  modalHealine: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 24,
+    color: '#FFF',
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
 

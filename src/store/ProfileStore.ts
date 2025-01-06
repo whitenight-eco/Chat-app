@@ -7,6 +7,7 @@ class ProfileStore {
   user: IUser | null = null;
   firstLogin: boolean = false;
   externalLink: string = '';
+  isConnected: boolean = false;
 
   constructor() {
     makeObservable(this, {
@@ -14,6 +15,7 @@ class ProfileStore {
       user: observable,
       firstLogin: observable,
       externalLink: observable,
+      isConnected: observable,
 
       // action functions
       isLoggedIn: computed,
@@ -77,6 +79,57 @@ class ProfileStore {
     }
   }
 
+  async deleteAllCollection(collectionName: string) {
+    try {
+      // Get all documents in the collection
+      const snapshot = await firestore().collection(collectionName).get();
+
+      // Loop through and delete each document
+      const batch = firestore().batch();
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      // Commit the batch
+      await batch.commit();
+      console.log(`Collection '${collectionName}' deleted successfully.`);
+    } catch (error) {
+      console.error('Error deleting collection:', error);
+    }
+  }
+
+  async getAllCollection(collectionName: string) {
+    try {
+      // Fetch all documents from the collection
+      const snapshot = await firestore().collection(collectionName).get();
+
+      // Map through the documents to extract data
+      const documents = snapshot.docs.map(doc => ({
+        id: doc.id, // Include the document ID
+        ...doc.data(), // Include the document fields
+      }));
+
+      console.log('Documents:', documents);
+      return documents;
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    }
+  }
+
+  async checkLink(contactLink: string) {
+    try {
+      const snapshot = await firestore()
+        .collection('users')
+        .where('externalLink', '==', contactLink)
+        .get();
+
+      if (snapshot.empty === false && snapshot.size > 0) return true;
+
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
   // async updateProfile(docid: any, profileData: any) {
   //   try {
   //     const res = await HendyApi.updateProfile(docid, profileData); //put(`${url.PROFILE_UPDATE}/${docid}`, profileData);
