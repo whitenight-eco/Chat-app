@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
@@ -8,7 +8,7 @@ import Layout from 'src/screens/Layout';
 import CommonHeader from 'src/components/CommonHeader';
 import useHNavigation from 'src/hooks/useHNavigation';
 
-import ProfileStore from 'src/store/ProfileStore';
+import ContactsStore from 'src/store/ContactsStore';
 
 import {
   Code,
@@ -20,14 +20,32 @@ import {Camera} from 'react-native-vision-camera';
 const QrScanScreen = () => {
   const [connectSuccessModalVisible, setConnectSuccessModalVisible] =
     useState(false);
+  const [error, setError] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
 
   const navigation = useHNavigation();
 
   const device = useCameraDevice('back');
 
+  useEffect(() => {
+    if (!device) {
+      setError(true);
+      setErrMsg('Your phone does not have a Camera.');
+    } else {
+      setError(false);
+      setErrMsg('');
+    }
+  }, [device]);
+
   const checkConnection = async (link: any) => {
-    const result = await ProfileStore.checkLink(link);
-    if (result) setConnectSuccessModalVisible(true);
+    const result = await ContactsStore.checkLink(link);
+    if (result.success) {
+      setError(false);
+      setConnectSuccessModalVisible(true);
+    } else {
+      setError(true);
+      setErrMsg(result.error || '');
+    }
   };
 
   const onCodeScanned = useCallback((codes: Code[]) => {
@@ -52,8 +70,6 @@ const QrScanScreen = () => {
     onCodeScanned: onCodeScanned,
   });
 
-  if (!device) return <View />;
-
   const hideConnectSuccessModalModal = () => {
     setConnectSuccessModalVisible(false);
     navigation.navigate('ContactsMain');
@@ -67,20 +83,28 @@ const QrScanScreen = () => {
         <Text style={styles.description}>
           Scan QR code with another cypher member
         </Text>
-        <View style={styles.cameraWrapper}>
-          <View style={styles.icon}>
-            <PowerOffIcon name="power-off" size={40} color="#CF3010" />
+        {device != null ? (
+          <View style={styles.cameraWrapper}>
+            <View style={styles.icon}>
+              <PowerOffIcon name="power-off" size={40} color="#CF3010" />
+            </View>
+            <View style={styles.cameraOutline}>
+              <Camera
+                device={device}
+                style={styles.camera}
+                isActive={true}
+                codeScanner={codeScanner}
+                orientation={'portrait'} //export type Orientation = 'portrait' | 'portrait-upside-down' | 'landscape-left' | 'landscape-right'
+              />
+            </View>
           </View>
-          <View style={styles.cameraOutline}>
-            <Camera
-              device={device}
-              style={styles.camera}
-              isActive={true}
-              codeScanner={codeScanner}
-              orientation={'portrait'} //export type Orientation = 'portrait' | 'portrait-upside-down' | 'landscape-left' | 'landscape-right'
-            />
-          </View>
-        </View>
+        ) : (
+          error && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.text}>{errMsg}</Text>
+            </View>
+          )
+        )}
       </View>
 
       {/* Connect Success Modal */}
@@ -182,6 +206,16 @@ const styles = StyleSheet.create({
     color: '#FFF',
     marginBottom: 15,
     textAlign: 'center',
+  },
+  text: {
+    color: 'red',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

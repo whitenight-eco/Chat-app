@@ -19,6 +19,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 import {observer} from 'mobx-react';
 import ProfileStore from 'src/store/ProfileStore';
+import ContactsStore from 'src/store/ContactsStore';
 
 import {Button} from 'src/components/Button/Button';
 
@@ -64,9 +65,14 @@ const CelluarWifiView = () => {
         setErrMsg('You must both add each other’s links');
         setLoading(false);
       } else {
-        setError(false);
-        const result = await ProfileStore.checkLink(contactLink);
-        if (result) setConnectSuccessModalVisible(true);
+        const result = await ContactsStore.checkLink(contactLink);
+        if (result.success) {
+          setError(false);
+          setConnectSuccessModalVisible(true);
+        } else {
+          setError(true);
+          setErrMsg(result.error || '');
+        }
         setLoading(false);
       }
     } else {

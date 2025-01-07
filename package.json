@@ -49,6 +49,7 @@
     "react-native-svg": "^15.10.1",
     "react-native-vector-icons": "^10.0.3",
     "react-native-vision-camera": "^3.8.2",
+    "react-native-worklets-core": "^1.5.0",
     "use-debounce": "^10.0.4",
     "yup": "^1.4.0"
   },

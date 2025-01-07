@@ -137,8 +137,8 @@ const styles = StyleSheet.create({
     borderColor: '#FF0404',
     borderRadius: 10,
     paddingHorizontal: 5,
-    marginTop: 75,
-    marginBottom: -116,
+    marginTop: 35,
+    marginBottom: -76,
     flexWrap: 'wrap',
   },
   errorText: {

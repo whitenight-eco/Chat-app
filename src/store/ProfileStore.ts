@@ -24,6 +24,7 @@ class ProfileStore {
 
   async init() {
     const res = await Utils.getObject('profile');
+    const externalLink = (await Utils.getString('externalLink')) || '';
     const firstLogin = await Utils.getString('first-login');
     if (firstLogin == null) {
       runInAction(() => (this.firstLogin = true));
@@ -31,6 +32,7 @@ class ProfileStore {
 
     runInAction(() => {
       this.user = res;
+      this.externalLink = externalLink;
     });
   }
 
@@ -116,20 +118,6 @@ class ProfileStore {
     }
   }
 
-  async checkLink(contactLink: string) {
-    try {
-      const snapshot = await firestore()
-        .collection('users')
-        .where('externalLink', '==', contactLink)
-        .get();
-
-      if (snapshot.empty === false && snapshot.size > 0) return true;
-
-      return false;
-    } catch (error) {
-      return false;
-    }
-  }
   // async updateProfile(docid: any, profileData: any) {
   //   try {
   //     const res = await HendyApi.updateProfile(docid, profileData); //put(`${url.PROFILE_UPDATE}/${docid}`, profileData);

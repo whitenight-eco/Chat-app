@@ -1,45 +1,32 @@
 import React, {useState, useEffect} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {View, Text, StyleSheet, TextInput, FlatList, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {useDebounce} from 'use-debounce';
 
 import Layout from 'src/screens/Layout';
-import {IContactsType} from 'src/types/contacts';
+import {IContactsType} from 'src/store/types';
 import CommonHeader from 'src/components/CommonHeader';
 
-const contacts: IContactsType[] = [
-  {
-    id: '1',
-    name: 'Adina Nurrahma',
-    image: 'https://via.placeholder.com/50',
-    status: 'online',
-  },
-  {
-    id: '2',
-    name: 'Mike Mazowski',
-    image: 'https://via.placeholder.com/50',
-    status: 'offline',
-  },
-  {
-    id: '3',
-    name: 'Marvin Robertson',
-    image: 'https://via.placeholder.com/50',
-    status: 'online',
-  },
-];
+import ContactsStore from 'src/store/ContactsStore';
 
 const ContactsScreen = () => {
   const [searchItem, setSearchItem] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchItem, 300);
-  const [filteredUsers, setFilteredUsers] = useState(contacts);
+  const [contacts, setContacts] = useState<IContactsType[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<IContactsType[]>([]);
+
+  useFocusEffect(() => {
+    setContacts(ContactsStore.contacts);
+  });
 
   useEffect(() => {
     const filteredItems = contacts.filter(user =>
       user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
     );
     setFilteredUsers(filteredItems);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, contacts]);
 
   const renderItem = ({item}: {item: IContactsType}) => (
     <View style={styles.contactItem}>
@@ -48,7 +35,7 @@ const ContactsScreen = () => {
         <View
           style={[
             styles.statusDot,
-            item.status === 'online' ? styles.online : styles.offline,
+            item.status ? styles.online : styles.offline,
           ]}
         />
       </View>
