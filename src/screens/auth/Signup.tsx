@@ -1,11 +1,5 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Text,
-  Alert,
-} from 'react-native';
+import {StyleSheet, View, ScrollView, Text, Alert} from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
@@ -110,7 +104,7 @@ const Signup = () => {
         username: values.username,
         publicKey,
         externalLink: externalLink,
-        isConnected: true,
+        netstats: 'online_internet',
         createdDate: moment().toISOString(),
       });
 

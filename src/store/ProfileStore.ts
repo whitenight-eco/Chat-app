@@ -7,7 +7,7 @@ class ProfileStore {
   user: IUser | null = null;
   firstLogin: boolean = false;
   externalLink: string = '';
-  isConnected: boolean = false;
+  netstats: string = '';
 
   constructor() {
     makeObservable(this, {
@@ -15,7 +15,7 @@ class ProfileStore {
       user: observable,
       firstLogin: observable,
       externalLink: observable,
-      isConnected: observable,
+      netstats: observable,
 
       // action functions
       isLoggedIn: computed,

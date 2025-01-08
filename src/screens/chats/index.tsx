@@ -10,7 +10,7 @@ const chats = [
     name: 'Maciej Kowalski',
     time: '08:43',
     image: 'https://via.placeholder.com/50',
-    status: 'online',
+    netstats: 'online_internet',
     message: 'maciej.kowalski@email.com',
   },
   {
@@ -18,7 +18,7 @@ const chats = [
     name: 'Odeusz Piotrowski',
     time: 'Tue',
     image: 'https://via.placeholder.com/50',
-    status: 'offline',
+    netstats: 'online_bluetooth',
     message: 'Will do, super, thank you 😊❤️',
   },
   {
@@ -26,7 +26,7 @@ const chats = [
     name: 'Bożenka Malina',
     time: 'Sun',
     image: 'https://via.placeholder.com/50',
-    status: 'online',
+    netstats: 'online_internet',
     message: 'Uploaded file.',
   },
   {
@@ -34,7 +34,7 @@ const chats = [
     name: 'Maciej Orlowski',
     time: '23 Mar',
     image: 'https://via.placeholder.com/50',
-    status: 'offline',
+    netstats: 'offline',
     message:
       'Here is another tutorial, if you Here is another tutorial Here is another tutorial, if you Here is another tutorial',
   },
@@ -48,7 +48,11 @@ const ChatsScreen = () => {
         <View
           style={[
             styles.statusDot,
-            item.status === 'online' ? styles.online : styles.offline,
+            item.netstats === 'online_internet'
+              ? styles.online_internet
+              : item.netstats === 'online_bluetooth'
+              ? styles.online_bluetooh
+              : styles.offline,
           ]}
         />
       </View>
@@ -112,11 +116,14 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
   },
-  online: {
+  online_internet: {
     backgroundColor: '#4CE417',
   },
-  offline: {
+  online_bluetooh: {
     backgroundColor: '#0B23F8',
+  },
+  offline: {
+    backgroundColor: '#808080',
   },
   chatInfo: {
     flex: 7,

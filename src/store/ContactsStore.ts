@@ -45,13 +45,13 @@ class ContactsStore {
         for (const doc of snapshot.docs) {
           const docdata = doc.data();
           const documentId = doc.ref.id;
-          const {username, isConnected} = docdata;
+          const {username, netstats} = docdata;
 
           const contact: IContactsType = {
             id: documentId,
             name: username,
             image: 'https://via.placeholder.com/50',
-            status: isConnected,
+            netstats: netstats,
           };
 
           // Check for duplicate ID
