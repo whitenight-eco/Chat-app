@@ -1,13 +1,9 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, ScrollView, Text, Alert} from 'react-native';
-import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/Feather';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {sha256} from 'react-native-sha256';
 import {observer} from 'mobx-react';
-
-import ProfileStore from 'src/store/ProfileStore';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
@@ -16,6 +12,12 @@ import {Button} from 'src/components/Button/Button';
 import {AuthInput} from 'src/components/Form';
 
 import Utils from 'src/utils/Utils';
+
+import ProfileStore from 'src/store/ProfileStore';
+import MainStore from 'src/store/MainStore';
+import LoginSuccessModal from './modal/LoginSuccessModal';
+import WrongPasswordModal from './modal/WrongPasswordModal';
+import ForgotPasswordModal from './modal/ForgotPasswordModal';
 
 interface ValuesType {
   password: string;
@@ -32,18 +34,8 @@ const MAX_FAILED_ATTEMPTS = 5;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const [loginSuccessModalVisible, setloginSuccessModalVisible] =
-    useState(false);
-  const [forgotPassModalVisible, setForgotPassModalVisible] = useState(false);
-  const [wrongPassModalVisible, setWrongPassModalVisible] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
 
   const navigation = useHNavigation();
-
-  const hideloginSuccessModalModal = () => {
-    setloginSuccessModalVisible(false);
-    navigation.navigate('Home');
-  };
 
   const handleLogin = async (values: ValuesType) => {
     setLoading(true);
@@ -90,13 +82,14 @@ const Login = () => {
         failedAttemptsCount >= MAX_FAILED_ATTEMPTS &&
         currentTime - lastFailedTimestamp < LOCKOUT_TIME
       ) {
-        setTimeRemaining(
+        MainStore.setRetryTimeRemain(
           Math.floor(
             (LOCKOUT_TIME - (currentTime - lastFailedTimestamp)) / 1000 / 60 +
               1,
           ),
         );
-        setWrongPassModalVisible(true);
+        MainStore.showWrongPasswordModal();
+        setLoading(false);
         return;
       }
 
@@ -113,7 +106,7 @@ const Login = () => {
 
         if (result) {
           setLoading(false);
-          setloginSuccessModalVisible(true);
+          MainStore.showLoginSuccessModal();
         } else {
           setLoading(false);
         }
@@ -130,12 +123,6 @@ const Login = () => {
       console.error('Error during login:', error);
       Alert.alert('Error', 'Something went wrong during login.');
     }
-  };
-
-  const handleForgotPasssword = async () => {
-    await Utils.clearAll();
-    setForgotPassModalVisible(false);
-    navigation.navigate('Dashboard');
   };
 
   return (
@@ -172,7 +159,7 @@ const Login = () => {
                   />
                   <Text
                     style={styles.description2}
-                    onPress={() => setForgotPassModalVisible(true)}>
+                    onPress={() => MainStore.showForgotPasswordModal()}>
                     Forgot password?
                   </Text>
                   <View style={styles.buttonWrapper}>
@@ -189,70 +176,9 @@ const Login = () => {
           </Card>
         </View>
 
-        {/* Login Success Modal */}
-        <Modal
-          isVisible={loginSuccessModalVisible}
-          onBackdropPress={hideloginSuccessModalModal}
-          backdropOpacity={1.0}
-          style={styles.modal}
-          animationIn="zoomInUp"
-          animationOut="zoomOut">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalIconWrapper}>
-              <Icon name="check" size={70} color="#FFFDFD" />
-            </View>
-            <Text style={styles.modalHealine}>Login Success</Text>
-            <Text style={styles.modalDescription}>Welcome to Cypher!</Text>
-          </View>
-        </Modal>
-
-        {/* Wrong Password Modal */}
-        <Modal
-          isVisible={wrongPassModalVisible}
-          onBackdropPress={() => setWrongPassModalVisible(false)}
-          backdropOpacity={1.0}
-          style={styles.modal}
-          animationIn="zoomInUp"
-          animationOut="zoomOut">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalIconWrapper2}>
-              <Icon name="x" size={70} color="#FFFDFD" />
-            </View>
-            <Text style={styles.modalHealine}>Incorrect password</Text>
-            <Text style={styles.modalDescription2}>
-              Try again after {timeRemaining} minutes
-            </Text>
-          </View>
-        </Modal>
-
-        {/* Forgot Password Modal */}
-        <Modal
-          isVisible={forgotPassModalVisible}
-          backdropOpacity={1.0}
-          style={styles.modal}
-          animationIn="zoomInUp"
-          animationOut="zoomOut">
-          <View style={styles.modalContainer}>
-            <Text style={styles.forgotPassHeadline}>Forgot password</Text>
-            <Text style={styles.forgotPassDescription}>
-              Account stored encrypted on your device. we unable to reset your
-              password. Delete account and start new?{'\n\n'}Note: Your
-              contacts, messages and feeds will be permanently lost and deleted.
-            </Text>
-            <View style={styles.forgotPassActionWrapper}>
-              <Text
-                style={styles.cancelButton}
-                onPress={() => setForgotPassModalVisible(false)}>
-                Cancel
-              </Text>
-              <Text
-                style={styles.deleteButton}
-                onPress={() => handleForgotPasssword()}>
-                Delete
-              </Text>
-            </View>
-          </View>
-        </Modal>
+        <LoginSuccessModal />
+        <WrongPasswordModal />
+        <ForgotPasswordModal />
       </ScrollView>
     </Layout>
   );
@@ -297,95 +223,5 @@ const styles = StyleSheet.create({
     marginTop: 300,
     marginBottom: 20,
     backgroundColor: '#05FCFC',
-  },
-  modal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 0, // Removes default margin around modal
-  },
-  modalContainer: {
-    width: '80%',
-    height: '35%',
-    backgroundColor: '#131212',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalIconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 100,
-    height: 100,
-    backgroundColor: '#000',
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#25FFAE',
-    marginBottom: 20,
-  },
-  modalIconWrapper2: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 100,
-    height: 100,
-    backgroundColor: '#000',
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#FF3F25',
-    marginBottom: 20,
-  },
-  modalHealine: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 24,
-    color: '#FFF',
-    marginBottom: 15,
-  },
-  modalDescription: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 14,
-    color: '#F2F2F2',
-    marginBottom: 30,
-  },
-  modalDescription2: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 14,
-    color: '#FF0606',
-    marginBottom: 30,
-  },
-  forgotPassHeadline: {
-    fontFamily: 'PublicSans-Bold',
-    fontSize: 19,
-    color: '#FFF',
-    marginBottom: 30,
-  },
-  forgotPassDescription: {
-    fontFamily: 'Poppins-Regular',
-    fontSize: 12,
-    color: '#FFF',
-    lineHeight: 21,
-  },
-  forgotPassActionWrapper: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: 12,
-    marginTop: 30,
-  },
-  cancelButton: {
-    flex: 3,
-    textAlign: 'center',
-    color: '#FFF',
-    padding: 10,
-    backgroundColor: '#414141',
-    borderRadius: 8,
-  },
-  deleteButton: {
-    flex: 3,
-    textAlign: 'center',
-    color: '#FF3B30',
-    padding: 10,
-    backgroundColor: '#131212',
-    borderColor: '#94A3B8',
-    borderWidth: 1,
-    borderRadius: 8,
   },
 });

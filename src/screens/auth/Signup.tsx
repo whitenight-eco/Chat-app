@@ -4,11 +4,8 @@ import {
   View,
   ScrollView,
   Text,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
-import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/Feather';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
@@ -24,6 +21,9 @@ import {Button} from 'src/components/Button/Button';
 import {AuthInput} from 'src/components/Form';
 
 import Utils from 'src/utils/Utils';
+
+import MainStore from 'src/store/MainStore';
+import SignupSuccessModal from './modal/SignupSuccessModal';
 
 interface ValuesType {
   username: string;
@@ -50,15 +50,8 @@ const SignupSchema = Yup.object().shape({
 
 const Signup = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(false);
 
   const navigation = useHNavigation();
-
-  const showModal = () => setVisible(true);
-  const hideModal = () => {
-    navigation.navigate('Login');
-    setVisible(false);
-  };
 
   const handleSignUp = async (values: ValuesType) => {
     setLoading(true);
@@ -123,7 +116,7 @@ const Signup = () => {
 
       if (docRef.id) {
         setLoading(false);
-        showModal();
+        MainStore.showSignupSuccessModal();
       } else {
         setLoading(false);
       }
@@ -210,23 +203,7 @@ const Signup = () => {
           </Card>
         </View>
 
-        <Modal
-          isVisible={visible}
-          onBackdropPress={hideModal}
-          backdropOpacity={1.0}
-          style={styles.modal}
-          animationIn="zoomInUp"
-          animationOut="zoomOut">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalIconWrapper}>
-              <Icon name="check" size={70} color="#FFFDFD" />
-            </View>
-            <Text style={styles.modalHealine}>Account created</Text>
-            <TouchableOpacity onPress={hideModal} activeOpacity={0.8}>
-              <Text style={styles.modalDescription}>Login to your account</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+        <SignupSuccessModal />
       </ScrollView>
     </Layout>
   );
@@ -270,42 +247,5 @@ const styles = StyleSheet.create({
     marginTop: 130,
     marginBottom: 20,
     backgroundColor: '#05FCFC',
-  },
-  modal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 0, // Removes default margin around modal
-  },
-  modalContainer: {
-    width: '80%',
-    height: '35%',
-    backgroundColor: '#131212',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalIconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 100,
-    height: 100,
-    backgroundColor: '#000',
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#25FFAE',
-    marginBottom: 20,
-  },
-  modalHealine: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 24,
-    color: '#FFF',
-    marginBottom: 15,
-  },
-  modalDescription: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 14,
-    color: '#F2F2F2',
-    marginBottom: 30,
   },
 });

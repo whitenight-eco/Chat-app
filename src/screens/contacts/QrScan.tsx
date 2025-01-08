@@ -1,29 +1,24 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/Feather';
-import PowerOffIcon from 'react-native-vector-icons/FontAwesome';
-
-import Layout from 'src/screens/Layout';
-import CommonHeader from 'src/components/CommonHeader';
-import useHNavigation from 'src/hooks/useHNavigation';
-
-import ContactsStore from 'src/store/ContactsStore';
-
 import {
   Code,
   useCameraDevice,
   useCodeScanner,
 } from 'react-native-vision-camera';
 import {Camera} from 'react-native-vision-camera';
+import PowerOffIcon from 'react-native-vector-icons/FontAwesome';
+
+import Layout from 'src/screens/Layout';
+import CommonHeader from 'src/components/CommonHeader';
+
+import MainStore from 'src/store/MainStore';
+import ContactsStore from 'src/store/ContactsStore';
+
+import ConnectSuccessModal from './ConnectSuccessModal';
 
 const QrScanScreen = () => {
-  const [connectSuccessModalVisible, setConnectSuccessModalVisible] =
-    useState(false);
   const [error, setError] = useState(false);
   const [errMsg, setErrMsg] = useState('');
-
-  const navigation = useHNavigation();
 
   const device = useCameraDevice('back');
 
@@ -41,7 +36,7 @@ const QrScanScreen = () => {
     const result = await ContactsStore.checkLink(link);
     if (result.success) {
       setError(false);
-      setConnectSuccessModalVisible(true);
+      MainStore.showConnectionSuccessModal();
     } else {
       setError(true);
       setErrMsg(result.error || '');
@@ -69,11 +64,6 @@ const QrScanScreen = () => {
     codeTypes: ['qr'],
     onCodeScanned: onCodeScanned,
   });
-
-  const hideConnectSuccessModalModal = () => {
-    setConnectSuccessModalVisible(false);
-    navigation.navigate('ContactsMain');
-  };
 
   return (
     <Layout>
@@ -107,23 +97,7 @@ const QrScanScreen = () => {
         )}
       </View>
 
-      {/* Connect Success Modal */}
-      <Modal
-        isVisible={connectSuccessModalVisible}
-        onBackdropPress={hideConnectSuccessModalModal}
-        backdropOpacity={1.0}
-        style={styles.modal}
-        animationIn="zoomInUp"
-        animationOut="zoomOut">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalIconWrapper}>
-            <Icon name="check" size={70} color="#FFFDFD" />
-          </View>
-          <Text style={styles.modalHealine} numberOfLines={2}>
-            You're now{'\n'}Connected!
-          </Text>
-        </View>
-      </Modal>
+      <ConnectSuccessModal />
     </Layout>
   );
 };

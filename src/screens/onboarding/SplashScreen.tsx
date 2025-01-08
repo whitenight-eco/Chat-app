@@ -12,6 +12,7 @@ interface IProps {
 const SplashScreen = (props: IProps) => {
   const [loading, setLoading] = useState(true);
   const finished = useRef(false);
+
   const init = async () => {
     try {
       await ProfileStore.init();
