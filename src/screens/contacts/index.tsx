@@ -1,37 +1,61 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {View, Text, StyleSheet, TextInput, FlatList, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
 
 import {useDebounce} from 'use-debounce';
 
 import Layout from 'src/screens/Layout';
-import {IContactsType} from 'src/store/types';
-import CommonHeader from 'src/components/CommonHeader';
+import {IUser} from 'src/types';
+import CommonHeader from 'src/components/header';
 
 import ContactsStore from 'src/store/ContactsStore';
+import useHNavigation from 'src/hooks/useHNavigation';
 
 const ContactsScreen = () => {
   const [searchItem, setSearchItem] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchItem, 300);
-  const [contacts, setContacts] = useState<IContactsType[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<IContactsType[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
+  const [existingChats, setExistingChats] = useState([]);
+
+  const navigation = useHNavigation();
 
   useFocusEffect(() => {
-    setContacts(ContactsStore.contacts);
+    setUsers(ContactsStore.users);
   });
 
   useEffect(() => {
-    const filteredItems = contacts.filter(user =>
-      user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
+    const filteredItems = users.filter(user =>
+      user?.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
     );
     setFilteredUsers(filteredItems);
-  }, [debouncedSearchTerm, contacts]);
+  }, [debouncedSearchTerm, users]);
 
-  const renderItem = ({item}: {item: IContactsType}) => (
-    <View style={styles.contactItem}>
+  const handlePress = useCallback(
+    (item: IUser) => {
+      navigation.navigate('Chat', item);
+    },
+    [existingChats, navigation],
+  );
+
+  const renderItem = ({item}: {item: IUser}) => (
+    <TouchableOpacity
+      onPress={() => handlePress(item)}
+      style={styles.contactItem}>
       <View style={styles.imageContainer}>
-        <Image source={{uri: item.image}} style={styles.contactImage} />
+        <Image source={{uri: item.avatar}} style={styles.contactImage} />
         <View
           style={[
             styles.statusDot,
@@ -43,14 +67,14 @@ const ContactsScreen = () => {
           ]}
         />
       </View>
-      <Text style={styles.contactName}>{item.name}</Text>
-    </View>
+      <Text style={styles.contactName}>{item.username}</Text>
+    </TouchableOpacity>
   );
 
   return (
     <Layout>
       <View style={styles.container}>
-        <CommonHeader name="Contacts" iconExist={true} />
+        <CommonHeader headerName="Contacts" iconExist={true} />
 
         {/* Search Bar */}
         <View style={styles.searchBar}>

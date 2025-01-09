@@ -15,7 +15,7 @@ const ConnectSuccessModal = () => {
 
   const hideConnectSuccessModalModal = () => {
     MainStore.hideConnectionSuccessModal();
-    navigation.navigate('ContactsMain');
+    navigation.navigate('Contacts');
   };
 
   return (

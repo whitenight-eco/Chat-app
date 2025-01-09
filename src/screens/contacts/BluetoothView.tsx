@@ -10,12 +10,12 @@ import {Camera, CameraPermissionStatus} from 'react-native-vision-camera';
 import {observer} from 'mobx-react';
 import ProfileStore from 'src/store/ProfileStore';
 
-import {Button} from 'src/components/Button/Button';
+import {Button} from 'src/components/button';
 import useHNavigation from 'src/hooks/useHNavigation';
 
 const BluetoothView = () => {
   const [loading, setLoading] = useState(false);
-  const [link, setLink] = useState(ProfileStore.externalLink);
+  const [link, setLink] = useState(ProfileStore.user?.externalLink || '');
 
   const [bluetoothStatus, setBluetoothStatus] = useState('');
   const [error, setError] = useState(false);

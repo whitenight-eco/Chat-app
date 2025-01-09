@@ -1,4 +1,5 @@
 import {makeObservable, observable, runInAction} from 'mobx';
+import {IActionSheet} from 'src/types';
 
 class MainStore {
   signupSuccessModalVisible: boolean = false;
@@ -7,6 +8,7 @@ class MainStore {
   timeRemaining: number = 0;
   forgotPasswordModalVisible: boolean = false;
   connectSuccessModalVisible: boolean = false;
+  actionsheet: IActionSheet = {visible: false};
 
   constructor() {
     makeObservable(this, {
@@ -17,6 +19,7 @@ class MainStore {
       timeRemaining: observable,
       forgotPasswordModalVisible: observable,
       connectSuccessModalVisible: observable,
+      actionsheet: observable,
     });
   }
 
@@ -62,6 +65,14 @@ class MainStore {
 
   hideConnectionSuccessModal() {
     runInAction(() => (this.connectSuccessModalVisible = false));
+  }
+
+  showActionSheet(actionsheet: IActionSheet) {
+    runInAction(() => (this.actionsheet = actionsheet));
+  }
+
+  hideActionSheet() {
+    runInAction(() => (this.actionsheet = {visible: false}));
   }
 }
 

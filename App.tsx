@@ -3,13 +3,16 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 // Navigation
 import RootNavigation from './src/routes/RootNavigation';
-import {ThemeProvider} from './src/theme/useTheme';
+import {ThemeProvider} from './src/contexts/useTheme';
+import {UnreadMessagesProvider} from 'src/contexts/UnreadMessagesContext';
 
 let Root = function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <RootNavigation />
+        <UnreadMessagesProvider>
+          <RootNavigation />
+        </UnreadMessagesProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

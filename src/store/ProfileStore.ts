@@ -1,21 +1,17 @@
 import {computed, makeObservable, observable, runInAction} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import Utils from 'src/utils/Utils';
-import {IUser, IUserLogin} from './types';
+import {IUser, IUserLogin} from 'src/types';
 
 class ProfileStore {
   user: IUser | null = null;
   firstLogin: boolean = false;
-  externalLink: string = '';
-  netstats: string = '';
 
   constructor() {
     makeObservable(this, {
       // observeralble variables
       user: observable,
       firstLogin: observable,
-      externalLink: observable,
-      netstats: observable,
 
       // action functions
       isLoggedIn: computed,
@@ -24,7 +20,6 @@ class ProfileStore {
 
   async init() {
     const res = await Utils.getObject('profile');
-    const externalLink = (await Utils.getString('externalLink')) || '';
     const firstLogin = await Utils.getString('first-login');
     if (firstLogin == null) {
       runInAction(() => (this.firstLogin = true));
@@ -32,13 +27,11 @@ class ProfileStore {
 
     runInAction(() => {
       this.user = res;
-      this.externalLink = externalLink;
     });
   }
 
   async userLogin(data: IUserLogin) {
     try {
-      const externalLink = await Utils.getString('externalLink');
       const snapshot = await firestore()
         .collection('users')
         .where('username', '==', data.username)
@@ -49,16 +42,20 @@ class ProfileStore {
         snapshot.forEach(doc => {
           const docdata = doc.data();
           Utils.storeObject('profile', docdata);
-          const {username, publicKey} = docdata;
+          const {id, username, avatar, netstats, publicKey, externalLink} =
+            docdata;
 
           const userInfo: IUser = {
+            id: id,
             username: username,
+            netstats: netstats,
+            avatar: avatar,
             publicKey: publicKey,
+            externalLink: externalLink,
           };
 
           runInAction(() => {
             this.user = userInfo;
-            this.externalLink = externalLink || '';
           });
         });
         return true;

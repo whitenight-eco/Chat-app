@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Layout from 'src/screens/Layout';
-import CommonHeader from 'src/components/CommonHeader';
+import CommonHeader from 'src/components/header';
 
 const posts = [
   {
@@ -83,7 +83,7 @@ const FeedsScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <CommonHeader name="Feeds" iconExist={true} />
+        <CommonHeader headerName="Feeds" iconExist={true} />
 
         {/* Feeds */}
         <FlatList

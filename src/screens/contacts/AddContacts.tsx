@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import Layout from 'src/screens/Layout';
-import CommonHeader from 'src/components/CommonHeader';
+import CommonHeader from 'src/components/header';
 import BluetoothView from './BluetoothView';
 import CelluarWifiView from './CelluarWifiView';
 
@@ -22,9 +22,9 @@ const AddContactsScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollview}>
         <View style={styles.container}>
           {connectionType === 'celluar_wifi' ? (
-            <CommonHeader name="Add Contacts" iconExist={false} />
+            <CommonHeader headerName="Add Contacts" iconExist={false} />
           ) : (
-            <CommonHeader name="Add Contacts" iconExist={true} />
+            <CommonHeader headerName="Add Contacts" iconExist={true} />
           )}
 
           <Text style={styles.subtitle}>Choose connection type</Text>

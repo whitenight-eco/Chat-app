@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,16 +17,21 @@ import NetInfo from '@react-native-community/netinfo';
 
 import {observer} from 'mobx-react';
 import ProfileStore from 'src/store/ProfileStore';
-import ContactsStore from 'src/store/ContactsStore';
 import MainStore from 'src/store/MainStore';
 
-import {Button} from 'src/components/Button/Button';
+import {Button} from 'src/components/button';
 import ConnectSuccessModal from './ConnectSuccessModal';
+import {
+  sendContactRequest,
+  listenForRequests,
+  handleRequest,
+} from './ContactRequest';
+import {IContactRequest} from 'src/types';
 
 const CelluarWifiView = () => {
   const [loading, setLoading] = useState(false);
 
-  const [link, setLink] = useState(ProfileStore.externalLink);
+  const [link, setLink] = useState(ProfileStore.user?.externalLink || '');
 
   const [contactLink, setContactLink] = useState('');
   const [error, setError] = useState(false);
@@ -47,26 +52,62 @@ const CelluarWifiView = () => {
 
   const handleContinue = async () => {
     setLoading(true);
+
     if (hasInternet) {
       if (!contactLink) {
         setError(true);
         setErrMsg('You must both add each other’s links');
         setLoading(false);
       } else {
-        const result = await ContactsStore.checkLink(contactLink);
+        // Send the contact request
+        const result = await sendContactRequest(contactLink);
+
         if (result.success) {
           setError(false);
-          MainStore.showConnectionSuccessModal();
+
+          // Start listening for incoming requests after sending the contact request
+          const onRequestReceived = async (request: IContactRequest) => {
+            console.log('Request received:', request);
+
+            // Handle the request (e.g., accept automatically)
+            const handleResult = await handleRequest(request);
+
+            if (handleResult.success) {
+              // Show the success modal when the request is successfully handled
+              MainStore.showConnectionSuccessModal();
+              setLoading(false); // Ensure loading is stopped after success
+            } else {
+              // Show an error message if handling the request failed
+              setError(true);
+              setErrMsg(handleResult.error || 'Error handling the request');
+              setLoading(false); // Ensure loading is stopped on error
+            }
+          };
+
+          try {
+            const unsubscribe = await listenForRequests(onRequestReceived);
+
+            // Cleanup listener after some time or when needed
+            setTimeout(() => {
+              unsubscribe();
+              setLoading(false); // Ensure loading is stopped after timeout
+            }, 60000); // Stop listening after 1 minute (or adjust as needed)
+          } catch (error) {
+            console.error('Error starting listener:', error);
+            setError(true);
+            setErrMsg('Error starting the listener');
+            setLoading(false); // Ensure loading is stopped on error
+          }
         } else {
           setError(true);
           setErrMsg(result.error || '');
+          setLoading(false); // Ensure loading is stopped on failure
         }
-        setLoading(false);
       }
     } else {
       setError(true);
       setErrMsg('You are not connected to the Internet.');
-      setLoading(false);
+      setLoading(false); // Ensure loading is stopped when there's no internet
     }
   };
 

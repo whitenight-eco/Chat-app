@@ -1,16 +1,20 @@
+import React, {useContext} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
-import {View, StyleSheet, ViewStyle} from 'react-native';
+import {View} from 'react-native';
 
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import ChatsScreen from 'src/screens/chats';
+import ContactsScreen from 'src/screens/contacts';
+import Chats from 'src/screens/chats';
 import FeedsScreen from 'src/screens/feeds';
-import ContactsStack from './ContactsStack';
+
+import {UnreadMessagesContext} from 'src/contexts/UnreadMessagesContext';
+
+const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
-  const Tab = createBottomTabNavigator();
+  const {unreadCount, setUnreadCount} = useContext(UnreadMessagesContext);
 
   const getTabIcon = (name: string, focused: boolean) => {
     const iconWrapperStyle = {
@@ -57,39 +61,14 @@ const TabNavigator = () => {
     }
   };
 
-  const CustomTabScreen = (name: string, component: any) => {
-    return (
-      <Tab.Screen
-        name={name}
-        component={component}
-        options={{
-          title: name,
-          tabBarLabelStyle: {
-            color: '#05FCFC',
-            fontFamily: 'Poppins-Medium',
-            fontSize: 12,
-            lineHeight: 16,
-            letterSpacing: 0.5,
-            paddingBottom: 10,
-          },
-          tabBarIcon: ({focused}) => getTabIcon(name, focused),
-        }}
-      />
-    );
-  };
-
-  const getTabBarStyle = (route: any): ViewStyle => {
-    const routeName = getFocusedRouteNameFromRoute(route);
-    if (routeName === 'AddContacts' || routeName === 'QrScan' ) {
-      return {display: 'none'};
-    }
+  const getTabBarLabelStyle = () => {
     return {
-      backgroundColor: '#13232C',
-      borderColor: '#000',
-      height: 75,
-      flexDirection: 'column',
-      justifyContent: 'space-around',
-      alignItems: 'center',
+      color: '#05FCFC',
+      fontFamily: 'Poppins-Medium',
+      fontSize: 12,
+      lineHeight: 16,
+      letterSpacing: 0.5,
+      paddingBottom: 10,
     };
   };
 
@@ -97,12 +76,27 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={({route}) => ({
         headerShown: false,
-        tabBarStyle: StyleSheet.flatten([getTabBarStyle(route)]),
+        tabBarStyle: {
+          backgroundColor: '#13232C',
+          borderColor: '#000',
+          height: 75,
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        },
+        tabBarLabelStyle: getTabBarLabelStyle(),
+        tabBarIcon: ({focused}) => getTabIcon(route.name, focused),
       })}
       initialRouteName="Chats">
-      {CustomTabScreen('Contacts', ContactsStack)}
-      {CustomTabScreen('Chats', ChatsScreen)}
-      {CustomTabScreen('Feeds', FeedsScreen)}
+      <Tab.Screen name="Contacts" component={ContactsScreen} />
+
+      <Tab.Screen
+        name="Chats"
+        options={{tabBarBadge: unreadCount > 0 ? unreadCount : undefined}}>
+        {() => <Chats setUnreadCount={setUnreadCount} />}
+      </Tab.Screen>
+
+      <Tab.Screen name="Feeds" component={FeedsScreen} />
     </Tab.Navigator>
   );
 };

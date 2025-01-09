@@ -1,10 +1,10 @@
 import React from 'react';
 import {StatusBar, StyleSheet, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTheme} from '../theme/useTheme';
+import {useTheme} from '../contexts/useTheme';
 
 import {LayoutPropsType} from '../types/components';
-import {ThemeContextInterface} from '../theme/useTheme';
+import {ThemeContextInterface} from '../contexts/useTheme';
 
 const Layout = ({children, style}: LayoutPropsType) => {
   const {theme}: Partial<ThemeContextInterface> = useTheme();

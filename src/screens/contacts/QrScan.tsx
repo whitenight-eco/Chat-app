@@ -9,12 +9,16 @@ import {Camera} from 'react-native-vision-camera';
 import PowerOffIcon from 'react-native-vector-icons/FontAwesome';
 
 import Layout from 'src/screens/Layout';
-import CommonHeader from 'src/components/CommonHeader';
+import CommonHeader from 'src/components/header';
 
 import MainStore from 'src/store/MainStore';
-import ContactsStore from 'src/store/ContactsStore';
-
 import ConnectSuccessModal from './ConnectSuccessModal';
+import {
+  sendContactRequest,
+  listenForRequests,
+  handleRequest,
+} from './ContactRequest';
+import {IContactRequest} from 'src/types';
 
 const QrScanScreen = () => {
   const [error, setError] = useState(false);
@@ -32,11 +36,42 @@ const QrScanScreen = () => {
     }
   }, [device]);
 
-  const checkConnection = async (link: any) => {
-    const result = await ContactsStore.checkLink(link);
+  const handleContinue = async (link: any) => {
+    // Send the contact request
+    const result = await sendContactRequest(link);
+
     if (result.success) {
       setError(false);
-      MainStore.showConnectionSuccessModal();
+
+      // Start listening for incoming requests after sending the contact request
+      const onRequestReceived = async (request: IContactRequest) => {
+        console.log('Request received:', request);
+
+        // Handle the request (e.g., accept automatically)
+        const handleResult = await handleRequest(request);
+
+        if (handleResult.success) {
+          // Show the success modal when the request is successfully handled
+          MainStore.showConnectionSuccessModal();
+        } else {
+          // Show an error message if handling the request failed
+          setError(true);
+          setErrMsg(handleResult.error || 'Error handling the request');
+        }
+      };
+
+      try {
+        const unsubscribe = await listenForRequests(onRequestReceived);
+
+        // Cleanup listener after some time or when needed
+        setTimeout(() => {
+          unsubscribe();
+        }, 60000); // Stop listening after 1 minute (or adjust as needed)
+      } catch (error) {
+        console.error('Error starting listener:', error);
+        setError(true);
+        setErrMsg('Error starting the listener');
+      }
     } else {
       setError(true);
       setErrMsg(result.error || '');
@@ -56,7 +91,7 @@ const QrScanScreen = () => {
     if (value == null) {
       return;
     }
-    checkConnection(value);
+    handleContinue(value);
   }, []);
 
   // Initialize the Code Scanner to scan QR code
@@ -68,7 +103,7 @@ const QrScanScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <CommonHeader name="QR Camera" iconExist={true} />
+        <CommonHeader headerName="QR Camera" iconExist={true} />
         <Text style={styles.subtitle}>Let's connect</Text>
         <Text style={styles.description}>
           Scan QR code with another cypher member

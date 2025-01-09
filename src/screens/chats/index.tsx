@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 
 import Layout from 'src/screens/Layout';
-import CommonHeader from 'src/components/CommonHeader';
+import CommonHeader from 'src/components/header';
 
 const chats = [
   {
@@ -40,7 +40,11 @@ const chats = [
   },
 ];
 
-const ChatsScreen = () => {
+interface ChatsProps {
+  setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const ChatsScreen: React.FC<ChatsProps> = ({setUnreadCount}) => {
   const renderItem = ({item}: {item: (typeof chats)[0]}) => (
     <View style={styles.chatItem}>
       <View style={styles.imageContainer}>
@@ -71,7 +75,7 @@ const ChatsScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <CommonHeader name="Chats" iconExist={true} />
+        <CommonHeader headerName="Chats" iconExist={true} />
 
         {/* chat List */}
         <FlatList

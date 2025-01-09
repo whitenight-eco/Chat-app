@@ -13,6 +13,11 @@ import Login from 'src/screens/auth/Login';
 import Signup from 'src/screens/auth/Signup';
 
 import TabNavigator from 'src/screens/navigator';
+import AddContactsScreen from 'src/screens/contacts/AddContacts';
+import QrScanScreen from 'src/screens/contacts/QrScan';
+import Chat from 'src/screens/chats/Chat';
+
+import {RootStackParamList} from 'src/types';
 
 const RootNavigation = () => {
   const [doneSplash, setDoneSplash] = useState(false);
@@ -22,7 +27,7 @@ const RootNavigation = () => {
     SplashScreen.hide();
   }, []);
 
-  const Stack = createStackNavigator();
+  const Stack = createStackNavigator<RootStackParamList>();
 
   return doneSplash ? (
     <NavigationContainer>
@@ -39,6 +44,9 @@ const RootNavigation = () => {
         <Stack.Screen name="Dashboard" component={Dashboard} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="AddContacts" component={AddContactsScreen} />
+        <Stack.Screen name="QrScan" component={QrScanScreen} />
+        <Stack.Screen name="Chat" component={Chat} />
       </Stack.Navigator>
     </NavigationContainer>
   ) : (
