@@ -7,7 +7,7 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
-import {useTheme, ThemeContextInterface} from '../../theme/useTheme';
+import {useTheme, ThemeContextInterface} from '../../contexts/useTheme';
 
 export type ButtonProps = {
   onPress: () => void;

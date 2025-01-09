@@ -4,8 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
-import Card from 'src/components/Card';
-import {Button} from 'src/components/Button/Button';
+import Card from 'src/components/card';
+import {Button} from 'src/components/button';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);

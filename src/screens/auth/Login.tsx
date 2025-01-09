@@ -7,9 +7,9 @@ import {observer} from 'mobx-react';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
-import Card from 'src/components/Card';
-import {Button} from 'src/components/Button/Button';
-import {AuthInput} from 'src/components/Form';
+import Card from 'src/components/card';
+import {Button} from 'src/components/button';
+import {AuthInput} from 'src/components/form';
 
 import Utils from 'src/utils/Utils';
 

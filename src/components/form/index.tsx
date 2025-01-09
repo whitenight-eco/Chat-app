@@ -9,8 +9,8 @@ import {
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5';
 import Octicon from 'react-native-vector-icons/Octicons';
 
-import {useTheme} from 'src/theme/useTheme';
-import {typeSizes} from 'src/theme/theme';
+import {useTheme} from 'src/contexts/useTheme';
+import {typeSizes} from 'src/contexts/theme';
 import {InputPropsType} from 'src/types/components';
 
 const AuthInput = ({

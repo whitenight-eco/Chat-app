@@ -10,9 +10,9 @@ import moment from 'moment';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 import Layout from 'src/components/Layout';
-import Card from 'src/components/Card';
-import {Button} from 'src/components/Button/Button';
-import {AuthInput} from 'src/components/Form';
+import Card from 'src/components/card';
+import {Button} from 'src/components/button';
+import {AuthInput} from 'src/components/form';
 
 import Utils from 'src/utils/Utils';
 
@@ -97,11 +97,12 @@ const Signup = () => {
       const hashedPbulicKey = await sha256(publicKey);
       const shortHash = hashedPbulicKey.slice(0, 24);
       const externalLink = `cypher://${shortHash}`;
-      await Utils.storeString('externalLink', externalLink);
 
       // Save username, public key in FireStore
       const docRef = await firestore().collection('users').add({
+        id: shortHash,
         username: values.username,
+        avatar: 'https://via.placeholder.com/50',
         publicKey,
         externalLink: externalLink,
         netstats: 'online_internet',
