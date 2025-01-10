@@ -10,42 +10,169 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import firestore, {
-  FirebaseFirestoreTypes,
-} from '@react-native-firebase/firestore';
+import {observer} from 'mobx-react';
 
+import firestore from '@react-native-firebase/firestore';
 import {useDebounce} from 'use-debounce';
 
 import Layout from 'src/screens/Layout';
-import {IUser} from 'src/types';
+import {IExistingChat, IUser} from 'src/types';
 import CommonHeader from 'src/components/header';
-
 import ContactsStore from 'src/store/ContactsStore';
 import useHNavigation from 'src/hooks/useHNavigation';
+import ProfileStore from 'src/store/ProfileStore';
 
 const ContactsScreen = () => {
   const [searchItem, setSearchItem] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchItem, 300);
+  const [contacts, setContacts] = useState<IUser[]>([]);
+  const [filteredContacts, setFilteredContacts] = useState<IUser[]>([]);
+
+  const [existingChats, setExistingChats] = useState<IExistingChat[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
-  const [existingChats, setExistingChats] = useState([]);
+
+  const currentUser = ProfileStore.user;
 
   const navigation = useHNavigation();
 
   useFocusEffect(() => {
-    setUsers(ContactsStore.users);
+    setContacts(ContactsStore.users);
   });
 
   useEffect(() => {
-    const filteredItems = users.filter(user =>
+    const filteredItems = contacts.filter(user =>
       user?.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
     );
-    setFilteredUsers(filteredItems);
-  }, [debouncedSearchTerm, users]);
+    setFilteredContacts(filteredItems);
+  }, [debouncedSearchTerm, contacts]);
+
+  useEffect(() => {
+    // Fetch users
+    const unsubscribeUsers = firestore()
+      .collection('users')
+      .orderBy('username', 'asc')
+      .onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          console.log('There are no users registered.');
+          setUsers([]);
+        } else {
+          const usersList: IUser[] = snapshot.docs.map(doc => {
+            const docData = doc.data();
+            return {
+              id: docData.id,
+              username: docData.username,
+              avatar: docData.avatar,
+              netstats: docData.netstats,
+              publicKey: docData.publicKey,
+              externalLink: docData.externalLink,
+            };
+          });
+          setUsers(usersList);
+        }
+      });
+
+    // Fetch existing chats
+    const unsubscribeChats = firestore()
+      .collection('chats')
+      .where('users', 'array-contains', {
+        publicKey: currentUser?.publicKey,
+        externalLink: currentUser?.externalLink,
+        username: currentUser?.username,
+        deletedFromChat: false,
+      })
+      .where('groupName', '==', '')
+      .onSnapshot(snapshot => {
+        const existingChats = snapshot.docs.map(doc => ({
+          chatId: doc.id,
+          users: doc.data().users as IUser[],
+        }));
+        setExistingChats(existingChats);
+      });
+
+    // Return cleanup function
+    return () => {
+      unsubscribeUsers();
+      unsubscribeChats();
+    };
+  }, [setUsers, setExistingChats]);
 
   const handlePress = useCallback(
-    (item: IUser) => {
-      navigation.navigate('Chat', item);
+    (contact: IUser) => {
+      let navigationChatID = '';
+      let messageYourselfChatID = '';
+
+      existingChats.forEach(existingChat => {
+        const isCurrentUserInTheChat = existingChat.users.some(
+          item => item.publicKey === currentUser?.publicKey,
+        );
+        const isMessageYourselfExists = existingChat.users.filter(
+          item => item.publicKey === contact.publicKey,
+        ).length;
+
+        if (
+          isCurrentUserInTheChat &&
+          existingChat.users.some(item => item.publicKey === contact.publicKey)
+        ) {
+          navigationChatID = existingChat.chatId;
+        }
+
+        if (isMessageYourselfExists === 2) {
+          messageYourselfChatID = existingChat.chatId;
+        }
+
+        if (currentUser?.publicKey === contact.publicKey) {
+          navigationChatID = '';
+        }
+      });
+
+      if (messageYourselfChatID) {
+        navigation.navigate('Chat', {
+          channel: messageYourselfChatID,
+          user: contact,
+        });
+      } else if (navigationChatID) {
+        navigation.navigate('Chat', {channel: navigationChatID, user: contact});
+      } else {
+        // Creates new chat
+        const newRef = firestore().collection('chats').doc();
+        newRef
+          .set({
+            lastUpdated: new Date().getTime(),
+            groupName: '', // It is not a group chat
+            users: [
+              {
+                publicKey: currentUser?.publicKey,
+                externalLink: currentUser?.externalLink,
+                username: currentUser?.username,
+                netstats: currentUser?.netstats,
+                deletedFromChat: false,
+              },
+              {
+                publicKey: contact.publicKey,
+                username: contact.username,
+                externalLink: contact.externalLink,
+                netstats: contact?.netstats,
+                deletedFromChat: false,
+              },
+            ],
+            lastAccess: [
+              {
+                username: currentUser?.username,
+                externalLink: currentUser?.externalLink,
+                date: new Date().getTime(),
+              },
+              {
+                username: contact.username,
+                externalLink: contact.externalLink,
+                date: null,
+              },
+            ],
+            messages: [],
+          })
+          .then(() => {
+            navigation.navigate('Chat', {channel: newRef.id, user: contact});
+          });
+      }
     },
     [existingChats, navigation],
   );
@@ -95,7 +222,7 @@ const ContactsScreen = () => {
 
         {/* Contact List */}
         <FlatList
-          data={filteredUsers}
+          data={filteredContacts}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.contactList}
@@ -177,4 +304,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactsScreen;
+export default observer(ContactsScreen);

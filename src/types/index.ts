@@ -1,3 +1,5 @@
+import {RouteProp} from '@react-navigation/native';
+
 export interface IUser {
   id: string;
   username: string;
@@ -31,6 +33,18 @@ export interface IActionSheet {
   onCancel?: () => void;
 }
 
+interface IChatUserInfo {
+  publicKey: string;
+  externalLink: string;
+  username: string;
+  deletedFromChat: boolean;
+}
+interface IChatLastAccess {
+  username: string;
+  externalLink: string;
+  date: number;
+}
+
 export interface IMessage {
   text?: string;
   image?: string;
@@ -40,6 +54,14 @@ export interface IMessage {
     id: string;
     name: string;
   };
+}
+
+export interface IChatDoc {
+  lastUpdated: number;
+  groupName: string;
+  users: IChatUserInfo[];
+  lastAccess: IChatLastAccess[];
+  messages: IMessage[];
 }
 
 export interface IContactRequest {
@@ -52,6 +74,16 @@ export interface IContactRequest {
   timestamp: string;
 }
 
+export interface IExistingChat {
+  chatId: string;
+  users: IUser[];
+}
+
+export interface IChatRouteProp {
+  channel: string;
+  user: IUser;
+}
+
 export type RootStackParamList = {
   Home: undefined;
   Dashboard: undefined;
@@ -59,5 +91,11 @@ export type RootStackParamList = {
   Signup: undefined;
   AddContacts: undefined;
   QrScan: undefined;
-  Chat: IUser; // Ensure the type matches the route params for the Chat screen
+  Chat: IChatRouteProp; // Ensure the type matches the route params for the Chat screen
 };
+
+type ChatRouteProp = RouteProp<RootStackParamList, 'Chat'>;
+
+export interface ChatProps {
+  route: ChatRouteProp;
+}

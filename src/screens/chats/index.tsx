@@ -1,8 +1,13 @@
-import React from 'react';
+import React, {useState, useCallback} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
 import Layout from 'src/screens/Layout';
 import CommonHeader from 'src/components/header';
+import Utils from 'src/utils/Utils';
+import ProfileStore from 'src/store/ProfileStore';
+import {IChatDoc, IMessage} from 'src/types';
 
 const chats = [
   {
@@ -40,12 +45,89 @@ const chats = [
   },
 ];
 
+interface StoredMessages {
+  [key: string]: number;
+}
 interface ChatsProps {
   setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ChatsScreen: React.FC<ChatsProps> = ({setUnreadCount}) => {
-  const renderItem = ({item}: {item: (typeof chats)[0]}) => (
+  // const [chats, setChats] = useState<IChatDoc[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newMessages, setNewMessages] = useState({});
+  const currentUser = ProfileStore.user;
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Load unread messages from AsyncStorage when screen is focused
+  //     const loadNewMessages = async () => {
+  //       try {
+  //         const storedMessages = await Utils.getObject('newMessages');
+
+  //         setNewMessages(storedMessages);
+  //         setUnreadCount(
+  //           Object.values(storedMessages).reduce(
+  //             (total, num) => total + num,
+  //             0,
+  //           ),
+  //         );
+  //       } catch (error) {
+  //         console.log('Error loading new messages from storage', error);
+  //       }
+  //     };
+
+  //     // Set up Firestore listener for chat updates
+  //     if (!currentUser) return;
+
+  //     const unsubscribe = firestore()
+  //       .collection('chats')
+  //       .where('users', 'array-contains', {
+  //         publicKey: currentUser?.publicKey,
+  //         externalLink: currentUser?.externalLink,
+  //         username: currentUser?.username,
+  //         deletedFromChat: false,
+  //       })
+  //       .orderBy('lastUpdated', 'desc')
+  //       .onSnapshot(snapshot => {
+  //         setChats(snapshot.docs);
+  //         setLoading(false);
+
+  //         snapshot.docChanges().forEach(change => {
+  //           if (change.type === 'modified') {
+  //             const chatId = change.doc.id;
+  //             const data = change.doc.data() as IChat;
+  //             const messages = data.messages;
+  //             const firstMessage = messages[0];
+
+  //             if (firstMessage?.user._id !== currentUser.email) {
+  //               setNewMessages(prev => {
+  //                 const updatedMessages = {
+  //                   ...prev,
+  //                   [chatId]: (prev[chatId] || 0) + 1,
+  //                 };
+  //                 Utils.storeObject('newMessages', updatedMessages);
+  //                 setUnreadCount(
+  //                   Object.values(updatedMessages).reduce(
+  //                     (total, num) => total + num,
+  //                     0,
+  //                   ),
+  //                 );
+  //                 return updatedMessages;
+  //               });
+  //             }
+  //           }
+  //         });
+  //       });
+  //     // Load unread messages and start listener when screen is focused
+  //     loadNewMessages();
+
+  //     // Clean up listener on focus change
+  //     return () => unsubscribe();
+  //   }, []),
+  // );
+
+  const renderItem = ({item}: {item: any}) => (
     <View style={styles.chatItem}>
       <View style={styles.imageContainer}>
         <Image source={{uri: item.image}} style={styles.contactImage} />
