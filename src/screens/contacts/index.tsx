@@ -36,7 +36,7 @@ const ContactsScreen = () => {
   const navigation = useHNavigation();
 
   useFocusEffect(() => {
-    setContacts(ContactsStore.users);
+    setContacts(ContactsStore.contacts);
   });
 
   useEffect(() => {
@@ -82,11 +82,16 @@ const ContactsScreen = () => {
       })
       .where('groupName', '==', '')
       .onSnapshot(snapshot => {
-        const existingChats = snapshot.docs.map(doc => ({
-          chatId: doc.id,
-          users: doc.data().users as IUser[],
-        }));
-        setExistingChats(existingChats);
+        if (snapshot.empty) {
+          console.log('There are no chats registered.');
+          setExistingChats([]);
+        } else {
+          const existingChats = snapshot.docs.map(doc => ({
+            chatId: doc.id,
+            users: doc.data().users as IUser[],
+          }));
+          setExistingChats(existingChats);
+        }
       });
 
     // Return cleanup function
@@ -100,7 +105,6 @@ const ContactsScreen = () => {
     (contact: IUser) => {
       let navigationChatID = '';
       let messageYourselfChatID = '';
-
       existingChats.forEach(existingChat => {
         const isCurrentUserInTheChat = existingChat.users.some(
           item => item.publicKey === currentUser?.publicKey,
@@ -137,21 +141,19 @@ const ContactsScreen = () => {
         const newRef = firestore().collection('chats').doc();
         newRef
           .set({
-            lastUpdated: new Date().getTime(),
+            lastUpdated: Date.now(),
             groupName: '', // It is not a group chat
             users: [
               {
                 publicKey: currentUser?.publicKey,
                 externalLink: currentUser?.externalLink,
                 username: currentUser?.username,
-                netstats: currentUser?.netstats,
                 deletedFromChat: false,
               },
               {
                 publicKey: contact.publicKey,
                 username: contact.username,
                 externalLink: contact.externalLink,
-                netstats: contact?.netstats,
                 deletedFromChat: false,
               },
             ],
@@ -159,7 +161,7 @@ const ContactsScreen = () => {
               {
                 username: currentUser?.username,
                 externalLink: currentUser?.externalLink,
-                date: new Date().getTime(),
+                date: Date.now(),
               },
               {
                 username: contact.username,

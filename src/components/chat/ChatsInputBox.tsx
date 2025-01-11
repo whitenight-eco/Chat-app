@@ -68,7 +68,7 @@ const ChatInputBox = (props: IProps) => {
       durationLimit: 100,
       presentationStyle: 'fullScreen',
     });
-    console.log(result);
+
     if (!result.didCancel && result.errorMessage == null) {
       const isImage = (result.assets?.[0].type?.indexOf('image') || 0) >= 0;
       const uploadResult = await (isImage
@@ -147,7 +147,7 @@ const ChatInputBox = (props: IProps) => {
           containerStyle={styles.emojiContainerModal}
           backgroundStyle={styles.emojiBackgroundModal}
           columns={5}
-          emojiSize={30}
+          emojiSize={60}
           activeShortcutColor="#2196f3"
           onEmojiSelected={emoji => {
             setValue(prevValue => `${prevValue} ${emoji || ''}`);

@@ -24,14 +24,14 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       channel,
       {
         ...data,
-        createdAt: new Date().getTime(),
+        createdAt: Date.now(),
         user: {
           id: user?.id || '',
           name: user?.username || '',
         },
       },
       error => {
-        console.log(error);
+        if (error) console.error(error);
       },
     );
   };

@@ -2,7 +2,7 @@ import {
   firebase,
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
-import {IChatDoc, IMessage} from 'src/types';
+import {IMessage} from 'src/types';
 
 class FSDatabse {
   db: FirebaseFirestoreTypes.Module = firebase.firestore();
@@ -12,17 +12,16 @@ class FSDatabse {
       const ref = this.db.collection('chats').doc(channel);
       const chatDoc = await ref.get();
 
-      if (chatDoc.exists) {
-chatDoc.data()?.lastUpdated
-      }
-
       // Append new message to existing messages
       const existingMessages = chatDoc.exists
         ? chatDoc.data()?.messages || []
         : [];
       const updatedMessages = [...existingMessages, body];
 
-      await ref.set({messages: updatedMessages}, {merge: true});
+      await ref.set(
+        {messages: updatedMessages, lastUpdated: Date.now()},
+        {merge: true},
+      );
 
       // Optional callback
       cb?.(null);

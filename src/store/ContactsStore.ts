@@ -5,13 +5,13 @@ import {IUser} from 'src/types';
 
 class ContactsStore {
   isConnected: boolean = false;
-  users: IUser[] = [];
+  contacts: IUser[] = [];
 
   constructor() {
     makeObservable(this, {
       // observeralble variables
       isConnected: observable,
-      users: observable,
+      contacts: observable,
     });
   }
 
@@ -20,7 +20,7 @@ class ContactsStore {
       const res = await Utils.getObject('contacts');
       if (res) {
         runInAction(() => {
-          this.users = res;
+          this.contacts = res;
         });
       }
     } catch (error) {
