@@ -2,7 +2,7 @@ import {
   firebase,
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
-import {IMessage} from 'src/types';
+import {IChatDoc, IMessage} from 'src/types';
 
 class FSDatabse {
   db: FirebaseFirestoreTypes.Module = firebase.firestore();
@@ -31,23 +31,32 @@ class FSDatabse {
     }
   }
 
-  load(channel: string, listener?: (messages: IMessage[]) => void) {
+  load(channel: string, listener?: (chatDoc: IChatDoc) => void): () => void {
     const ref = this.db.collection('chats').doc(channel);
 
-    ref.onSnapshot(
+    const unsubscribe = ref.onSnapshot(
       snapshot => {
         if (snapshot.exists) {
-          const data = snapshot.data();
-          const messages: IMessage[] = data?.messages || [];
-          listener?.(messages);
+          const data = snapshot.data() as IChatDoc;
+          listener?.(data);
         } else {
-          listener?.([]);
+          listener?.({
+            chatId: ref.id,
+            lastUpdated: 0,
+            groupName: '',
+            groupAvatar: '',
+            users: [],
+            lastAccess: [],
+            messages: [],
+          });
         }
       },
       error => {
-        console.error('Error loading messages:', error.message);
+        console.error('Error loading chat document:', error.message);
       },
     );
+
+    return unsubscribe;
   }
 
   async removeMessage(channel: string, messageId: string) {

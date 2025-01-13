@@ -33,12 +33,13 @@ export interface IActionSheet {
   onCancel?: () => void;
 }
 
-interface IChatUserInfo {
+export interface IChatUserInfo {
   publicKey: string;
   externalLink: string;
   username: string;
   deletedFromChat: boolean;
 }
+
 interface IChatLastAccess {
   username: string;
   externalLink: string;
@@ -56,9 +57,18 @@ export interface IMessage {
   };
 }
 
+interface IGroupAdminInfo {
+  publicKey: string;
+  externalLink: string;
+  username: string;
+}
+
 export interface IChatDoc {
+  chatId: string;
+  groupAdmins?: IGroupAdminInfo;
   lastUpdated: number;
   groupName: string;
+  groupAvatar?: string;
   users: IChatUserInfo[];
   lastAccess: IChatLastAccess[];
   messages: IMessage[];
@@ -81,7 +91,7 @@ export interface IExistingChat {
 
 export interface IChatRouteProp {
   channel: string;
-  user: IUser;
+  chatName: string;
 }
 
 export type RootStackParamList = {

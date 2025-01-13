@@ -47,8 +47,8 @@ const ChatList = (props: IProps) => {
   };
 
   const shouldShowTime = (currentMessage: IMessage, index: number) => {
-    if (index === props.messages.length - 1) return true; // Show time for the first message
-    const previousMessage = props.messages[index + 1];
+    if (index === 0) return true; // Show time for the first message
+    const previousMessage = props.messages[index - 1];
     if (!previousMessage) return true;
 
     const currentTime = moment(currentMessage.createdAt || 0);
@@ -104,7 +104,7 @@ const ChatList = (props: IProps) => {
             </View>
           </>
         )}
-        inverted
+        // inverted
       />
       <ImageView
         images={images}

@@ -8,7 +8,6 @@ import MainStore from 'src/store/MainStore';
 import Utils from 'src/utils/Utils';
 
 import useHNavigation from 'src/hooks/useHNavigation';
-import ProfileStore from 'src/store/ProfileStore';
 
 const ForgotPasswordModal = () => {
   const {forgotPasswordModalVisible} = MainStore;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 
 import AddIcon from 'react-native-vector-icons/Ionicons';
@@ -6,18 +6,19 @@ import SearchIcon from 'react-native-vector-icons/Ionicons';
 import ThreeDotIcon from 'react-native-vector-icons/Entypo';
 import QrCodeScanIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CloseIcon from 'react-native-vector-icons/Ionicons';
+import GroupIcon from 'react-native-vector-icons/MaterialIcons';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 
 const CommonHeader = ({
-  image,
-  username,
+  avatar,
+  isGroup,
   netstats,
   headerName,
   iconExist,
 }: {
-  image?: string;
-  username?: string;
+  avatar?: string;
+  isGroup?: boolean;
   netstats?: string;
   headerName: string;
   iconExist: boolean;
@@ -77,28 +78,36 @@ const CommonHeader = ({
 
   return (
     <View style={styles.header}>
-      {image && username && netstats ? (
-        <View style={styles.userContainer}>
-          <View style={styles.imageContainer}>
-            <Image source={{uri: image}} style={styles.contactImage} />
-            <View
-              style={[
-                styles.statusDot,
-                netstats === 'online_internet'
-                  ? styles.online_internet
-                  : netstats === 'online_bluetooth'
-                  ? styles.online_bluetooh
-                  : styles.offline,
-              ]}
-            />
-          </View>
-          <Text style={styles.name} numberOfLines={1}>
-            {username}
-          </Text>
+      <View style={styles.userContainer}>
+        <View style={styles.imageContainer}>
+          {avatar && (
+            <>
+              {!isGroup ? (
+                <>
+                  <Image source={{uri: avatar}} style={styles.avatar} />
+                  <View
+                    style={[
+                      styles.statusDot,
+                      netstats === 'online_internet'
+                        ? styles.online_internet
+                        : netstats === 'online_bluetooth'
+                        ? styles.online_bluetooh
+                        : styles.offline,
+                    ]}
+                  />
+                </>
+              ) : (
+                <>
+                  <View style={styles.groupDefaultIcon}>
+                    <GroupIcon name={'people-outline'} size={24} color="#000" />
+                  </View>
+                </>
+              )}
+            </>
+          )}
         </View>
-      ) : (
         <Text style={styles.headerTitle}>{headerName}</Text>
-      )}
+      </View>
       {renderIcons()}
     </View>
   );
@@ -122,10 +131,18 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
   },
-  contactImage: {
+  avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  groupDefaultIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#05FCFC',
   },
   statusDot: {
     position: 'absolute',

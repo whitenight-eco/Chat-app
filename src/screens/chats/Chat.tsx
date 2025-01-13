@@ -8,15 +8,19 @@ import ChatInputBox from 'src/components/chat/ChatsInputBox';
 import ChatList from 'src/components/chat/ChatList';
 
 import ProfileStore from 'src/store/ProfileStore';
+import ContactsStore from 'src/store/ContactsStore';
 import FSDatabase from 'src/utils/FSDatabase';
-import {ChatProps, IMessage} from 'src/types';
+import {ChatProps, IMessage, IChatUserInfo} from 'src/types';
 
 const Chat: React.FC<ChatProps> = ({route}) => {
-  const {channel} = route.params;
-  const {username, avatar, netstats} = route.params.user;
-
+  const {channel, chatName} = route.params;
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [avatar, setAvatar] = useState<string>('');
+  const [isGroup, setIsGroup] = useState<boolean>(false);
+  const [netstats, setNetstats] = useState<string>('');
   const hasMounted = useRef<boolean>(true);
+
+  const currentUser = ProfileStore.user;
 
   const onSend = (data: {text?: string; image?: string; video?: string}) => {
     const user = ProfileStore.user;
@@ -36,21 +40,41 @@ const Chat: React.FC<ChatProps> = ({route}) => {
     );
   };
 
-  useEffect(() => {
-    FSDatabase.load(channel, data => {
-      const messages = Object.entries(data || {})
-        .map(([key, message]) => ({
-          key,
-          ...message,
-        }))
-        .sort((a, b) => b.createdAt - a.createdAt);
+  const getAvatarAndNetstats = (
+    users: IChatUserInfo[],
+  ): {avatar: string; netstats: string} => {
+    const chattingUser =
+      users[0].publicKey === currentUser?.publicKey ? users[1] : users[0];
 
+    const chattingUserInfo = ContactsStore.contacts.find(
+      item => item.publicKey === chattingUser?.publicKey,
+    );
+
+    return {
+      avatar: chattingUserInfo?.avatar || '',
+      netstats: chattingUserInfo?.netstats || '',
+    };
+  };
+
+  useEffect(() => {
+    const unsubscribe = FSDatabase.load(channel, chatDoc => {
       if (hasMounted.current) {
-        setMessages(messages);
+        setMessages(chatDoc.messages);
+        if (chatDoc.groupName !== '') {
+          setIsGroup(true);
+          setAvatar(chatDoc.groupAvatar || 'default');
+        } else {
+          setIsGroup(false);
+          const result = getAvatarAndNetstats(chatDoc.users);
+          setAvatar(result.avatar || 'default');
+          setNetstats(result.netstats || '');
+        }
       }
     });
+
     return () => {
       hasMounted.current = false;
+      unsubscribe();
     };
   }, []);
 
@@ -59,10 +83,10 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       <View style={styles.container}>
         <View style={styles.chatContainer}>
           <CommonHeader
-            image={avatar}
-            username={username}
+            avatar={avatar}
+            isGroup={isGroup}
             netstats={netstats}
-            headerName="Chat"
+            headerName={chatName}
             iconExist={true}
           />
           <ChatList messages={messages} />
