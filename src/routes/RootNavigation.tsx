@@ -16,6 +16,10 @@ import TabNavigator from 'src/screens/navigator';
 import AddContactsScreen from 'src/screens/contacts/AddContacts';
 import QrScanScreen from 'src/screens/contacts/QrScan';
 import Chat from 'src/screens/chats/Chat';
+import GroupProfile from 'src/screens/group/GroupProfile';
+import GroupProfileEdit from 'src/screens/group/GroupProfileEdit';
+import Poll from 'src/screens/poll';
+import Event from 'src/screens/event';
 
 import {RootStackParamList} from 'src/types';
 
@@ -47,6 +51,10 @@ const RootNavigation = () => {
         <Stack.Screen name="AddContacts" component={AddContactsScreen} />
         <Stack.Screen name="QrScan" component={QrScanScreen} />
         <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="GroupProfile" component={GroupProfile} />
+        <Stack.Screen name="GroupProfileEdit" component={GroupProfileEdit} />
+        <Stack.Screen name="Poll" component={Poll} />
+        <Stack.Screen name="Event" component={Event} />
       </Stack.Navigator>
     </NavigationContainer>
   ) : (

@@ -9,7 +9,7 @@ import {
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import AddIcon from 'react-native-vector-icons/Ionicons';
-import MicIcon from 'react-native-vector-icons/FontAwesome5';
+import AudioIcon from 'react-native-vector-icons/MaterialIcons';
 import SendIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CameraIcon from 'react-native-vector-icons/FontAwesome5';
 
@@ -23,7 +23,7 @@ interface IProps {
   onSend: (data: {text?: string; image?: string; video?: string}) => void;
 }
 
-const ChatInputBox = (props: IProps) => {
+const ChatIndividualInputBox = (props: IProps) => {
   const [value, setValue] = useState('');
   const input = useRef<TextInput | any>();
   const [modal, setModal] = useState(false);
@@ -123,7 +123,7 @@ const ChatInputBox = (props: IProps) => {
           />
           {value === '' && (
             <TouchableOpacity style={styles.micIconWrapper}>
-              <MicIcon name="microphone" size={22} color="#000" />
+              <AudioIcon name="multitrack-audio" size={22} color="#000" />
             </TouchableOpacity>
           )}
         </View>
@@ -224,4 +224,4 @@ const styles = StyleSheet.create({
   emojiBackgroundModal: {},
 });
 
-export default ChatInputBox;
+export default ChatIndividualInputBox;

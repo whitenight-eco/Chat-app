@@ -102,6 +102,10 @@ export type RootStackParamList = {
   AddContacts: undefined;
   QrScan: undefined;
   Chat: IChatRouteProp; // Ensure the type matches the route params for the Chat screen
+  GroupProfile: undefined;
+  GroupProfileEdit: undefined;
+  Poll: undefined;
+  Event: undefined;
 };
 
 type ChatRouteProp = RouteProp<RootStackParamList, 'Chat'>;

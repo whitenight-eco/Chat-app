@@ -4,7 +4,8 @@ import {View, StyleSheet} from 'react-native';
 import Layout from 'src/screens/Layout';
 
 import CommonHeader from 'src/components/header';
-import ChatInputBox from 'src/components/chat/ChatsInputBox';
+import ChatIndividualInputBox from 'src/components/chat/ChatIndividualInputBox';
+import ChatGroupInputBox from 'src/components/chat/ChatGroupInputBox';
 import ChatList from 'src/components/chat/ChatList';
 
 import ProfileStore from 'src/store/ProfileStore';
@@ -90,7 +91,11 @@ const Chat: React.FC<ChatProps> = ({route}) => {
             iconExist={true}
           />
           <ChatList messages={messages} />
-          <ChatInputBox onSend={onSend} />
+          {isGroup ? (
+            <ChatGroupInputBox onSend={onSend} />
+          ) : (
+            <ChatIndividualInputBox onSend={onSend} />
+          )}
         </View>
       </View>
     </Layout>

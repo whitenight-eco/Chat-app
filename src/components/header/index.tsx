@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 
 import AddIcon from 'react-native-vector-icons/Ionicons';
@@ -7,6 +7,7 @@ import ThreeDotIcon from 'react-native-vector-icons/Entypo';
 import QrCodeScanIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CloseIcon from 'react-native-vector-icons/Ionicons';
 import GroupIcon from 'react-native-vector-icons/MaterialIcons';
+import GoBackIcon from 'react-native-vector-icons/MaterialIcons';
 
 import useHNavigation from 'src/hooks/useHNavigation';
 
@@ -71,8 +72,27 @@ const CommonHeader = ({
             </TouchableOpacity>
           </View>
         ) : null;
-      default:
+      case '':
+        return iconExist ? (
+          <TouchableOpacity>
+            <ThreeDotIcon name="dots-three-vertical" size={20} color="#FFF" />
+          </TouchableOpacity>
+        ) : null;
+      case 'Rename group':
         return null;
+      case 'Poll':
+        return null;
+      default:
+        return (
+          <View style={styles.iconWrapper}>
+            <TouchableOpacity>
+              <SearchIcon name="search" size={20} color="#FFF" />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <ThreeDotIcon name="dots-three-vertical" size={20} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        );
     }
   };
 
@@ -98,15 +118,32 @@ const CommonHeader = ({
                 </>
               ) : (
                 <>
-                  <View style={styles.groupDefaultIcon}>
+                  <TouchableOpacity
+                    style={styles.groupDefaultIcon}
+                    onPress={() => navigation.navigate('GroupProfile')}>
                     <GroupIcon name={'people-outline'} size={24} color="#000" />
-                  </View>
+                  </TouchableOpacity>
                 </>
               )}
             </>
           )}
         </View>
-        <Text style={styles.headerTitle}>{headerName}</Text>
+        {headerName ? (
+          <>
+            {(headerName === 'Rename group' ||
+              headerName === 'Poll' ||
+              headerName === 'Event') && (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <GoBackIcon name="arrow-back" size={30} color="#FFF" />
+              </TouchableOpacity>
+            )}
+            <Text style={styles.headerTitle}>{headerName}</Text>
+          </>
+        ) : (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <GoBackIcon name="arrow-back" size={30} color="#FFF" />
+          </TouchableOpacity>
+        )}
       </View>
       {renderIcons()}
     </View>
