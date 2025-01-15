@@ -91,19 +91,25 @@ const BluetoothView = () => {
 
   return (
     <>
-      <Text style={styles.step}>Scan each other’s QR codes</Text>
+      <View style={styles.container}>
+        <Text style={styles.step}>Scan each other’s QR codes</Text>
 
-      <View style={styles.qrcodeWrapper}>
-        <QRCode value={link} size={200} color="black" backgroundColor="white" />
-      </View>
-
-      {error && (
-        <View style={styles.errorContainer}>
-          <WaringIcon name="warning-outline" size={24} color="#FF0404" />
-          <Text style={styles.errorText}>{errMsg}</Text>
+        <View style={styles.qrcodeWrapper}>
+          <QRCode
+            value={link}
+            size={200}
+            color="black"
+            backgroundColor="white"
+          />
         </View>
-      )}
 
+        {error && (
+          <View style={styles.errorContainer}>
+            <WaringIcon name="warning-outline" size={24} color="#FF0404" />
+            <Text style={styles.errorText}>{errMsg}</Text>
+          </View>
+        )}
+      </View>
       <View style={styles.buttonWrapper}>
         <Button
           style={styles.button}
@@ -117,17 +123,18 @@ const BluetoothView = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   step: {
     color: '#FFF',
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
-    paddingBottom: 20,
   },
   qrcodeWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 50,
-    marginBottom: 46,
   },
   errorContainer: {
     flexDirection: 'row',
@@ -137,8 +144,7 @@ const styles = StyleSheet.create({
     borderColor: '#FF0404',
     borderRadius: 10,
     paddingHorizontal: 5,
-    marginTop: 35,
-    marginBottom: -76,
+    marginTop: 100,
     flexWrap: 'wrap',
   },
   errorText: {
@@ -154,8 +160,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    marginTop: 145,
-    marginBottom: 20,
     backgroundColor: '#05FCFC',
   },
 });

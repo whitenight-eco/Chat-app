@@ -18,6 +18,7 @@ import FileIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import PollIcon from 'react-native-vector-icons/EvilIcons';
 import EventIcon from 'react-native-vector-icons/MaterialIcons';
 
+import useHNavigation from 'src/hooks/useHNavigation';
 import FStorage from 'src/utils/FStorage';
 
 interface IProps {
@@ -29,6 +30,8 @@ const ChatGroupInputBox = (props: IProps) => {
   const [value, setValue] = useState('');
   const input = useRef<TextInput | any>();
   const [modalVisible, setModalVisible] = useState(false);
+
+  const navigation = useHNavigation();
 
   const onChangeText = (text: string) => {
     props.onChangeText?.(text);
@@ -90,30 +93,11 @@ const ChatGroupInputBox = (props: IProps) => {
     {label: 'camera', onPress: onCamera},
     {label: 'audio', onPress: () => {}},
     {label: 'file', onPress: () => {}},
-    {label: 'poll', onPress: () => {}},
-    {label: 'event', onPress: () => {}},
+    {label: 'poll', onPress: () => navigation.navigate('Poll')},
+    {label: 'event', onPress: () => navigation.navigate('Event')},
   ];
 
   const getModalIcon = (label: string) => {
-    switch (label) {
-      case 'gallery':
-        return <GalleryIcon name="image" size={40} color="#2C2C2C" />;
-      case 'camera':
-        return <CameraIcon name="camera" size={40} color="#000" />;
-      case 'audio':
-        return <AudioIcon name="multitrack-audio" size={40} color="#000" />;
-      case 'file':
-        return <FileIcon name="file-document-outline" size={40} color="#000" />;
-      case 'poll':
-        return <PollIcon name="chart" size={40} color="#000" />;
-      case 'event':
-        return <EventIcon name="event-note" size={40} color="#000" />;
-      default:
-        return null;
-    }
-  };
-
-  const handleNavigate = (label: string) => {
     switch (label) {
       case 'gallery':
         return <GalleryIcon name="image" size={40} color="#2C2C2C" />;
@@ -185,9 +169,8 @@ const ChatGroupInputBox = (props: IProps) => {
                   key={index}
                   style={styles.optionWrapper}
                   onPress={() => {
-                    console.log(option.label);
-                    handleNavigate(option.label);
                     setModalVisible(false);
+                    option.onPress();
                   }}>
                   <View style={styles.optionButton}>
                     {getModalIcon(option.label)}

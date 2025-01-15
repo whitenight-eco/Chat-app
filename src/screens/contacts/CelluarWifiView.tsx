@@ -118,31 +118,32 @@ const CelluarWifiView = () => {
 
   return (
     <>
-      <Text style={styles.step}>1. Exchange links with your contact</Text>
-      <Text style={styles.instruction}>Give below link to your contact</Text>
-      <View style={styles.linkContainer}>
-        <Text style={styles.link}>{link}</Text>
-        <TouchableOpacity onPress={() => copyToClipboard()}>
-          <ClipBoardIcon name="copy" size={20} color="#000" />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.step}>2. Enter links from your contact</Text>
-      <TextInput
-        style={[styles.input, error && styles.inputError]}
-        placeholder="Enter link from your contact here"
-        placeholderTextColor="#94A3B8"
-        value={contactLink}
-        onChangeText={text => setContactLink(text)}
-      />
-
-      {error && (
-        <View style={styles.errorContainer}>
-          <WaringIcon name="warning-outline" size={24} color="#FF0404" />
-          <Text style={styles.errorText}>{errMsg}</Text>
+      <View style={styles.container}>
+        <Text style={styles.step}>1. Exchange links with your contact</Text>
+        <Text style={styles.instruction}>Give below link to your contact</Text>
+        <View style={styles.linkContainer}>
+          <Text style={styles.link}>{link}</Text>
+          <TouchableOpacity onPress={() => copyToClipboard()}>
+            <ClipBoardIcon name="copy" size={20} color="#000" />
+          </TouchableOpacity>
         </View>
-      )}
 
+        <Text style={styles.step}>2. Enter links from your contact</Text>
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          placeholder="Enter link from your contact here"
+          placeholderTextColor="#94A3B8"
+          value={contactLink}
+          onChangeText={text => setContactLink(text)}
+        />
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <WaringIcon name="warning-outline" size={24} color="#FF0404" />
+            <Text style={styles.errorText}>{errMsg}</Text>
+          </View>
+        )}
+      </View>
       <View style={styles.buttonWrapper}>
         <Button
           style={styles.button}
@@ -160,11 +161,14 @@ const CelluarWifiView = () => {
 export default observer(CelluarWifiView);
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   step: {
     color: '#FFF',
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   instruction: {
     color: '#FFF',
@@ -172,7 +176,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 19,
     paddingLeft: 10,
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   linkContainer: {
     flexDirection: 'row',
@@ -211,8 +215,7 @@ const styles = StyleSheet.create({
     borderColor: '#FF0404',
     borderRadius: 10,
     paddingHorizontal: 5,
-    marginTop: 75,
-    marginBottom: -118,
+    marginTop: 100,
     flexWrap: 'wrap',
   },
   errorText: {
@@ -228,8 +231,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    marginTop: 180,
-    marginBottom: 20,
     backgroundColor: '#05FCFC',
   },
 });

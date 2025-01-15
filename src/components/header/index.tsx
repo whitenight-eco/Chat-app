@@ -82,6 +82,8 @@ const CommonHeader = ({
         return null;
       case 'Poll':
         return null;
+      case 'Event':
+        return null;
       default:
         return (
           <View style={styles.iconWrapper}>
