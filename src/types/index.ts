@@ -45,8 +45,7 @@ interface IChatLastAccess {
   externalLink: string;
   date: number;
 }
-
-export interface IMessage {
+export interface IMessageDetail {
   text?: string;
   image?: string;
   video?: string;
@@ -54,7 +53,15 @@ export interface IMessage {
   user: {
     id: string;
     name: string;
+    publicKey: string;
   };
+  encryptedKeyForSender: string; // Symmetric key encrypted with sender's public key
+  encryptedKeyForRecipient: string; // Symmetric key encrypted with recipient's public key
+}
+
+export interface IMessage {
+  encryptedMessageForRecipient: IMessageDetail;
+  encryptedMessageForSender: IMessageDetail;
 }
 
 interface IGroupAdminInfo {

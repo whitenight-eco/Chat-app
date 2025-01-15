@@ -8,13 +8,13 @@ import {
   StyleSheet,
 } from 'react-native';
 import moment from 'moment';
-import {IMessage} from 'src/types';
+import {IMessage, IMessageDetail} from 'src/types';
 import ProfileStore from 'src/store/ProfileStore';
 import ImageView from 'react-native-image-viewing';
 import Video from 'react-native-video';
 
 interface IProps {
-  messages: IMessage[];
+  messages: IMessageDetail[];
 }
 
 const ChatList = (props: IProps) => {
@@ -23,7 +23,7 @@ const ChatList = (props: IProps) => {
 
   const user = ProfileStore.user;
 
-  const isMine = (item: IMessage) => item.user.id === user?.id;
+  const isMine = (item: IMessageDetail) => item.user.id === user?.id;
 
   const dynamicDisplayTime = (date: number) => {
     const messageDate = moment(new Date(date));
@@ -46,7 +46,7 @@ const ChatList = (props: IProps) => {
     setIsVisible(true);
   };
 
-  const shouldShowTime = (currentMessage: IMessage, index: number) => {
+  const shouldShowTime = (currentMessage: IMessageDetail, index: number) => {
     if (index === 0) return true; // Show time for the first message
     const previousMessage = props.messages[index - 1];
     if (!previousMessage) return true;

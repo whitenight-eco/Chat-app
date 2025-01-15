@@ -11,11 +11,11 @@ import ChatList from 'src/components/chat/ChatList';
 import ProfileStore from 'src/store/ProfileStore';
 import ContactsStore from 'src/store/ContactsStore';
 import FSDatabase from 'src/utils/FSDatabase';
-import {ChatProps, IMessage, IChatUserInfo} from 'src/types';
+import {ChatProps, IChatUserInfo, IMessageDetail} from 'src/types';
 
 const Chat: React.FC<ChatProps> = ({route}) => {
   const {channel, chatName} = route.params;
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [avatar, setAvatar] = useState<string>('');
   const [isGroup, setIsGroup] = useState<boolean>(false);
   const [netstats, setNetstats] = useState<string>('');
@@ -33,7 +33,10 @@ const Chat: React.FC<ChatProps> = ({route}) => {
         user: {
           id: user?.id || '',
           name: user?.username || '',
+          publicKey: user?.publicKey || '',
         },
+        encryptedKeyForRecipient: '',
+        encryptedKeyForSender: '',
       },
       error => {
         if (error) console.error(error);
