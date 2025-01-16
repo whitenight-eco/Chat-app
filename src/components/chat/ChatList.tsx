@@ -8,10 +8,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import moment from 'moment';
-import {IMessage, IMessageDetail} from 'src/types';
+import {IMessageDetail} from 'src/types';
 import ProfileStore from 'src/store/ProfileStore';
 import ImageView from 'react-native-image-viewing';
 import Video from 'react-native-video';
+import PollView from './PollView';
+import EventView from './EventView';
 
 interface IProps {
   messages: IMessageDetail[];
@@ -56,6 +58,10 @@ const ChatList = (props: IProps) => {
     return currentTime.diff(previousTime, 'seconds') > 60;
   };
 
+  const renderItem = ({item}: {item: IMessageDetail}) => {
+
+  };
+  
   return (
     <View style={styles.container}>
       <FlatList
@@ -112,6 +118,8 @@ const ChatList = (props: IProps) => {
         visible={visible}
         onRequestClose={() => setIsVisible(false)}
       />
+      <PollView />
+      <EventView />
     </View>
   );
 };

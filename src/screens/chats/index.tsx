@@ -162,10 +162,10 @@ const ChatsScreen: React.FC<ChatsProps> = ({setUnreadCount}) => {
         case 'message':
           const latestMessage = chat.messages?.reduce(
             (latest, current) =>
-              current.createdAt > latest.createdAt ? current : latest,
+              current.encryptedMessageForRecipient.createdAt > latest.encryptedMessageForRecipient.createdAt ? current : latest,
             chat.messages[0],
           );
-          return latestMessage?.text;
+          return latestMessage?.encryptedMessageForRecipient.text;
 
         case 'lastedUpdateTime':
           return dynamicDisplayTime(chat.lastUpdated);
@@ -184,10 +184,10 @@ const ChatsScreen: React.FC<ChatsProps> = ({setUnreadCount}) => {
         case 'message':
           const latestMessage = chat.messages?.reduce(
             (latest, current) =>
-              current.createdAt > latest.createdAt ? current : latest,
+              current.encryptedMessageForRecipient.createdAt > latest.encryptedMessageForRecipient.createdAt ? current : latest,
             chat.messages[0],
           );
-          return latestMessage?.text;
+          return latestMessage?.encryptedMessageForRecipient.text;
 
         case 'lastedUpdateTime':
           return dynamicDisplayTime(chat.lastUpdated);
