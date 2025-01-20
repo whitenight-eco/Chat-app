@@ -8,12 +8,12 @@
     tools:context=".MainActivity">
 
     <FrameLayout
+        android:id="@+id/screensholder"
         android:layout_width="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/MNavbt"
         android:layout_height="0dp"
         android:background="@color/bg"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/screensholder"/>
+        app:layout_constraintBottom_toTopOf="@id/MNavbt"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/MNavbt"
