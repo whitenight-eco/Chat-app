@@ -1,0 +1,9 @@
+- When Signup store hashed externalLink into localstorage and firebase firestore
+- When Login store hashed externallink to profile store
+- Implement Bluetooth, CelluarWifi, QrScan UI/UX
+- Implement live search using debounce
+- Refine Project Structure
+- Implement functionality that track Internet connection, if internet availale, connect each other
+- Implement functionality that after qrcode scan, if successful, connect each other 
+
+

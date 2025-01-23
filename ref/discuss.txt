@@ -1,0 +1,14 @@
+I have a problem to discuss with you regarding the current development method.
+In addition to "Kotlin", mobile app development can be done using "Java", "Flutter", and "React Native".
+
+Previous developer used the "Kotlin" language to develop app that can only work on Android.
+Considering the possibility of future scalability, I think it would be better to create an app that works on both Android and iOS at the same time.
+
+If you want to create an app that can work on both Anroid and iOS by using the "Kotlin" language, need to develop  iOS separately for Android and iOS.
+This is not effective in terms of development speed, time, or cost.
+
+The best way to overcome these problems is to use "React Native" to develop the app.
+Of course, the result is the same as when developing with "Kotlin".
+However, if we use "React Native", don't have to develop separately for Android and iOS, and it is much superior in terms of development speed, time, and cost than using "Kotlin".
+
+Therefore, I am planning to use "React Native" to develop the app, and I would appreciate it if you could let me know your opinion on this.
